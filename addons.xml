@@ -86,27 +86,4 @@
         </assets>
     </extension>
 </addon>
-<?xml version="1.0" encoding="UTF-8"?>
-<addon id="plugin.video.oneplayvip" version="0.0.3" name="[COLOR aquamarine][B]ONE[/COLOR][COLOR white]PLAY [COLOR aquamarine]VIP[/COLOR][/B][/COLOR]" provider-name="Equipe OnePlay">
-    <requires>
-        <import addon="script.module.simplejson" />
-        <import addon="script.module.six" />
-        <import addon="script.module.kodi-six" />
-        <import addon="script.module.requests"/>
-        <import addon="script.module.pyxbmct" />
-    </requires>    
-    <extension point="xbmc.python.pluginsource" library="app.py">
-        <provides>video</provides>
-    </extension>  
-    <extension point="xbmc.addon.metadata">
-		<summary lang="pt">OnePlay VIP é um plugin baseado no aplicativo OnePlay Alpha para TV BOX ou ANDROID TV.</summary>
-		<description lang="pt">Essa é uma versão semelhante ao OnePlay Alpha nem tudo é igual ao app oficial e a recomendação.</description>
-        <description></description>
-        <platform>all</platform>
-        <assets>
-			<icon>icon.png</icon>
-            <fanart>fanart.jpg</fanart>
-		</assets>
-    </extension>
-</addon>
 </addons>
