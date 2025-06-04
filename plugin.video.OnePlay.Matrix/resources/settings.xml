@@ -1,0 +1,15 @@
+<settings>
+<category label="Geral">
+	<setting label="Primeiro Acesso" id="first" type="bool" visible="false" default="true"/>
+	<setting label="Mostrar Adultos" id="hidexxx" type="bool" visible="false" default="false"/>
+	<setting label="Senha Parental para Adultos" option="hidden" visible="false" id="parental_password" type="text" default=""/>
+	<setting label="Exibir VIP Oneplay" id="exibirvip" type="bool" default="true" />
+	<setting label="DNS (Resolvedor)" id="enderecodns" type="text" default="1.1.1.1"/>
+	<setting label="Tipo de Canais" id="tipocanais" type="enum" values="M3U8|MPEGTS" default="0" />
+</category>
+<category label="PROXY">
+	<setting label="[COLOR lightblue]Configurações de Proxy[/COLOR]" type="lsep"/>
+	<setting label="Proxy" id="proxy" type="text" default=""/>
+	<setting label="Usar Proxy" id="useproxy" type="bool" default="false" />
+</category>
+</settings>
