@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<addon id="script.module.fasthttp" name="FastHttp" version="0.0.6" provider-name="Joel">
+    <requires>
+        <import addon="script.module.six" />
+        <import addon="script.module.kodi-six" />
+    </requires>
+    <extension point="xbmc.python.module" library="lib" />
+    <extension point="xbmc.python.pluginsource" library="lib/default.py" />
+    <extension point="xbmc.addon.metadata">
+        <platform>all</platform>
+        <summary lang="en">fasthttp - internet access tool for webscraping</summary>
+        <summary lang="pt">fasthttp - ferramenta de acesso a internet para webscraping</summary>
+        <description lang="en">fasthttp is a tool that makes interception difficult in https mode, in addition to simulating a desktop browser</description>
+        <description lang="pt">fasthttp é uma ferramenta que dificulta interceptação no modo https, alem de simular um navegador de desktop</description>
+        <disclaimer lang="en">fasthttp is a tool that is not affiliated with xbmc/kodi, therefore 3rd party</disclaimer>
+        <disclaimer lang="pt">fasthttp é uma ferramenta que não é filiada ao xbmc/kodi, portanto de terceiros</disclaimer>
+        <assets>
+            <icon>icon.jpg</icon>
+            <fanart>fanart.jpg</fanart>
+        </assets>
+    </extension>
+</addon>
