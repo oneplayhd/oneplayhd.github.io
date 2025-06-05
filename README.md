@@ -1,4 +1,4 @@
-# Repositório Oficial OnePlayHD — Todos os direitos reservados!  
+# Repositório Oficial OnePlayHD !!!  
 Este repositório atua exclusivamente como um agregador de links e não hospeda, transmite ou reproduz qualquer conteúdo de mídia. A responsabilidade pelo conteúdo acessado é exclusiva do respectivo provedor ou fonte original.  
 
 Como instalar o repositório OnePlay para ter acesso aos melhores conteúdos da atualidade!
