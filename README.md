@@ -15,6 +15,6 @@ Como instalar o repositório OnePlay para ter acesso aos melhores conteúdos da 
   </ul>
 </p>
 
-                ** Pronto! Tudo certo — agora é só aproveitar com responsabilidade!!**
+    ** Pronto! Tudo certo — agora é só aproveitar com responsabilidade!!**
 
 ## Use, Abuse e Reuse — com consciência e dentro da lei!
