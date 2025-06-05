@@ -529,6 +529,17 @@ Rumble - v1.0.0.matrix
 	</news>
 </extension>
 </addon>
+<addon id="plugin.video.simplem3u8" version="1.0.0" name="Simple M3U8 Player" provider-name="SeuNome">
+    <extension point="xbmc.python.pluginsource" library="default.py">
+        <provides>video</provides>
+    </extension>
+    <extension point="xbmc.addon.metadata">
+        <summary>Simple addon to play M3U8 streams</summary>
+        <description>This addon plays an M3U8 stream from a specified URL.</description>
+        <platform>all</platform>
+        <language>en</language>
+    </extension>
+</addon>
 <addon id="plugin.video.spartanaddon" version="0.0.4" name="[COLOR yellow]SPARTAN[/COLOR]" provider-name="OnePlay Team">
     <requires>
         <import addon="script.module.simplejson" />
