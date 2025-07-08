@@ -897,7 +897,7 @@ provider-name="jurialmunkey">
 - Fix non-UTF-8 byte string decoding in Python 2.</news>
   </extension>
 </addon>
-<addon id="script.module.netunblock" name="Net Unblock" version="0.0.1" provider-name="Joel">
+<addon id="script.module.netunblock" name="Net Unblock" version="0.0.2" provider-name="Joel">
     <requires>
         <import addon="script.module.six" />
         <import addon="script.module.kodi-six" />
