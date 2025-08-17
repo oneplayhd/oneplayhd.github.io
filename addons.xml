@@ -745,7 +745,7 @@ provider-name="jurialmunkey">
         </assets>
     </extension>
 </addon>
-<addon id="script.limpeza.Matrix" name="[COLORred]Script[/COLOR] [COLORgreen]Limpeza[/COLOR]" provider-name="BOSS" version="1.0"> 
+<addon id="script.limpeza.Matrix" name="[COLORred]Script[/COLOR] [COLORgreen]Limpeza[/COLOR]" provider-name="BOSS" version="1.1"> 
   <requires>
     <import addon="xbmc.python" version="3.0.0" /> 
   </requires>
