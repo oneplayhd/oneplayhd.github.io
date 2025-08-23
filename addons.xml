@@ -1162,7 +1162,7 @@ provider-name="jurialmunkey">
 </addon>
 <addon id="service.subtitles.legendei"
        name="Legendei"
-       version="0.0.3"
+       version="0.0.4"
        provider-name="zoreu">
 	<requires>
 		<import addon="script.module.kodi-six" />
