@@ -29,6 +29,12 @@ def zip_mais_recente(pasta: Path):
 def data_formatada(path: Path):
     return datetime.fromtimestamp(path.stat().st_mtime).strftime("%d/%m/%Y")
 
+# 🔥 REMOVE index.html DE TODAS AS SUBPASTAS
+def remover_indexes_subpastas():
+    for path in ROOT.rglob("index.html"):
+        if path.parent != ROOT:
+            path.unlink()
+
 def gerar_index_raiz():
     linhas = []
     linhas.append("<html>")
@@ -48,7 +54,7 @@ def gerar_index_raiz():
         '<td>&nbsp;</td><td align="right"> - </td><td>&nbsp;</td></tr>'
     )
 
-    # ZIPs (um por pasta)
+    # ZIPs (1 por pasta)
     for pasta in sorted(ROOT.iterdir(), key=lambda x: x.name.lower()):
         if not pasta.is_dir() or pasta.name.startswith("."):
             continue
@@ -68,24 +74,13 @@ def gerar_index_raiz():
 
     linhas.append('<tr><th colspan="5"><hr></th></tr>')
     linhas.append("</table>")
-
-    # Scripts (opcional – não afeta o Kodi)
-    linhas.append("""
-<script data-cfasync="false" src="../cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script>
-<script src="js/jquery.js"></script>
-<script src="js/bootstrap.min.js"></script>
-<script src="js/vegas.min.js"></script>
-<script src="js/wow.min.js"></script>
-<script src="js/smoothscroll.js"></script>
-<script src="js/custom.js"></script>
-""")
-
     linhas.append("</body>")
     linhas.append("</html>")
 
     (ROOT / "index.html").write_text("\n".join(linhas), encoding="utf-8")
 
 def main():
+    remover_indexes_subpastas()
     gerar_index_raiz()
 
 if __name__ == "__main__":
