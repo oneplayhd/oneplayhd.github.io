@@ -1,7 +1,7 @@
 from pathlib import Path
 import re
 
-ROOT = Path(".")
+ROOT = Path(".").resolve()
 
 def extrair_versao(nome):
     m = re.search(r"-([\d\.]+)\.zip$", nome)
@@ -19,10 +19,14 @@ def zip_mais_recente(pasta: Path):
                 zips.append((ver, f))
     if not zips:
         return None
-    return max(zips, key=lambda x: list(map(int, x[0].split("."))))[1]
+    return max(
+        zips,
+        key=lambda x: [int(p) for p in x[0].split(".")]
+    )[1]
 
 def gerar_index(pasta: Path):
-    if not pasta_tem_zip(pasta):
+    # ❗ regra: raiz sempre gera index
+    if pasta != ROOT and not pasta_tem_zip(pasta):
         index = pasta / "index.html"
         if index.exists():
             index.unlink()
@@ -36,15 +40,15 @@ def gerar_index(pasta: Path):
         "<pre>"
     ]
 
-    if pasta.parent != pasta:
+    if pasta != ROOT:
         linhas.append('<a href="../index.html">..</a>')
 
     # pastas válidas
-    for item in sorted(pasta.iterdir()):
+    for item in sorted(pasta.iterdir(), key=lambda x: x.name.lower()):
         if item.is_dir() and pasta_tem_zip(item):
             linhas.append(f'<a href="./{item.name}/index.html">{item.name}</a>')
 
-    # apenas o zip mais recente
+    # zip mais recente (somente se existir na pasta)
     zip_recente = zip_mais_recente(pasta)
     if zip_recente:
         linhas.append(f'<a href="./{zip_recente.name}">{zip_recente.name}</a>')
