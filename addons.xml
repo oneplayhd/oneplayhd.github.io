@@ -1092,7 +1092,7 @@ provider-name="jurialmunkey">
     </assets>
   </extension>
 </addon>
-<addon id="script.oneplayvip.downloader" name="ONEPLAY VIP DOWNLOADER" version="1.0.3" provider-name="Oneplay team">
+<addon id="script.oneplayvip.downloader" name="ONEPLAY VIP DOWNLOADER" version="1.0.4" provider-name="Oneplay team">
     <requires>
         <import addon="script.module.six"/>
         <import addon="script.module.kodi-six"/>
