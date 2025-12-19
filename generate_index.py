@@ -1,6 +1,9 @@
 from pathlib import Path
 import re
 
+# 🔥 cache para evitar rglob repetido (performance)
+ZIP_CACHE: dict[Path, bool] = {}
+
 
 def extrair_versao(nome: str):
     m = re.search(r"One\.repo-(\d+(?:\.\d+)*)\.zip", nome)
@@ -25,14 +28,16 @@ def encontrar_repos_mais_recentes(raiz: Path) -> list[Path]:
 
 
 def pasta_contem_zip(pasta: Path) -> bool:
-    return any(pasta.rglob("*.zip"))
+    if pasta not in ZIP_CACHE:
+        ZIP_CACHE[pasta] = any(pasta.rglob("*.zip"))
+    return ZIP_CACHE[pasta]
 
 
 def limpar_index_se_necessario(pasta: Path, raiz: Path):
     index = pasta / "index.html"
     if pasta != raiz and index.exists():
         index.unlink()
-        print(f"🧹 index removido (pasta sem zip): {pasta.resolve()}")
+        print(f"🧹 index removido (sem zip): {pasta.resolve()}")
 
 
 def gerar_index_em_pasta(pasta: Path, raiz: Path, repos_recentes: list[Path]):
