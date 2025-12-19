@@ -56,12 +56,12 @@ def gerar_index(pasta: Path, raiz: Path, repos_recentes: list[Path]):
     tem_zip = pasta_contem_zip_direto(pasta)
     raiz_tem_zip = bool(repos_recentes)
 
-    # ❌ remover index de pasta sem zip (exceto raiz)
+    # ❌ remove index de pasta sem zip (exceto raiz)
     if pasta != raiz and not tem_zip:
         remover_index(pasta)
         return
 
-    # ❌ remover index da raiz se não existir nenhum zip no repo
+    # ❌ remove index da raiz se não houver nenhum zip no repo
     if pasta == raiz and not raiz_tem_zip:
         remover_index(pasta)
         return
@@ -108,7 +108,7 @@ def gerar_index(pasta: Path, raiz: Path, repos_recentes: list[Path]):
         "</html>",
     ])
 
-    # 🔥 tabela da raiz
+    # 🔥 tabela oculta da raiz
     if pasta == raiz and raiz_tem_zip:
         linhas.append("")
         linhas.append('<div id="Repositorio-KODI" style="display:none">')
@@ -137,8 +137,8 @@ if __name__ == "__main__":
 
     varrer_recursivo(raiz, raiz, repos_recentes)
 
-    # 🔁 se qualquer index mudou, recalcula e atualiza a raiz
+    # 🔥 REGRA FINAL: se QUALQUER index mudou, a raiz é sempre regenerada
     if INDEX_MUDOU:
-        print("🔁 Atualizando índice da raiz...")
+        print("🔁 Sincronizando index da raiz...")
         repos_recentes = encontrar_repos_mais_recentes(raiz)
         gerar_index(raiz, raiz, repos_recentes)
