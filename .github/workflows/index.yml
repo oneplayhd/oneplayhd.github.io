@@ -35,10 +35,10 @@ jobs:
           git config user.name "github-actions"
           git config user.email "actions@github.com"
 
-          # só adiciona se existir
-          git add index.html **/index.html || true
+          # adiciona CRIAÇÃO, MODIFICAÇÃO E REMOÇÃO
+          git add -A
 
-          # verifica se houve mudança real
+          # se não houve mudança real, sai
           if git diff --cached --quiet; then
             echo "No changes to commit"
             exit 0
@@ -46,7 +46,5 @@ jobs:
 
           git commit -m "Auto update index (latest zip only)"
 
-          # sincroniza ANTES do push
           git pull --rebase origin master
-
           git push origin master
