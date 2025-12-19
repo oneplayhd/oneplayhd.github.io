@@ -42,23 +42,27 @@ def remover_index(pasta: Path):
         print(f"🧹 index removido: {pasta.resolve()}")
 
 
-def escrever_index(path: Path, conteudo: str):
+def escrever_index(pasta: Path, conteudo: str):
     global INDEX_MUDOU
-    if not path.exists() or path.read_text(encoding="utf-8") != conteudo:
-        path.write_text(conteudo, encoding="utf-8")
+    index = pasta / "index.html"
+
+    if not index.exists() or index.read_text(encoding="utf-8") != conteudo:
+        index.write_text(conteudo, encoding="utf-8")
         INDEX_MUDOU = True
-        print(f"✔ index atualizado: {path.parent.resolve()}")
+        print(f"✔ index gerado/atualizado: {pasta.resolve()}")
 
 
 def gerar_index(pasta: Path, raiz: Path, repos_recentes: list[Path]):
-    contem_zip_direto = pasta_contem_zip_direto(pasta)
+    tem_zip = pasta_contem_zip_direto(pasta)
     raiz_tem_zip = bool(repos_recentes)
 
-    # ❌ regra de remoção
-    if (
-        (pasta == raiz and not raiz_tem_zip) or
-        (pasta != raiz and not contem_zip_direto)
-    ):
+    # ❌ remover index de pasta sem zip (exceto raiz)
+    if pasta != raiz and not tem_zip:
+        remover_index(pasta)
+        return
+
+    # ❌ remover index da raiz se não existir nenhum zip no repo
+    if pasta == raiz and not raiz_tem_zip:
         remover_index(pasta)
         return
 
@@ -104,6 +108,7 @@ def gerar_index(pasta: Path, raiz: Path, repos_recentes: list[Path]):
         "</html>",
     ])
 
+    # 🔥 tabela da raiz
     if pasta == raiz and raiz_tem_zip:
         linhas.append("")
         linhas.append('<div id="Repositorio-KODI" style="display:none">')
@@ -114,7 +119,7 @@ def gerar_index(pasta: Path, raiz: Path, repos_recentes: list[Path]):
         linhas.append("</table>")
         linhas.append("</div>")
 
-    escrever_index(pasta / "index.html", "\n".join(linhas))
+    escrever_index(pasta, "\n".join(linhas))
 
 
 def varrer_recursivo(pasta: Path, raiz: Path, repos_recentes: list[Path]):
@@ -128,13 +133,12 @@ def varrer_recursivo(pasta: Path, raiz: Path, repos_recentes: list[Path]):
 if __name__ == "__main__":
     raiz = Path(".")
 
-    # 1️⃣ primeira leitura
     repos_recentes = encontrar_repos_mais_recentes(raiz)
 
     varrer_recursivo(raiz, raiz, repos_recentes)
 
-    # 2️⃣ se algo mudou, recalcula versões e atualiza raiz
+    # 🔁 se qualquer index mudou, recalcula e atualiza a raiz
     if INDEX_MUDOU:
-        print("🔁 Recalculando versão mais recente após mudanças...")
+        print("🔁 Atualizando índice da raiz...")
         repos_recentes = encontrar_repos_mais_recentes(raiz)
         gerar_index(raiz, raiz, repos_recentes)
