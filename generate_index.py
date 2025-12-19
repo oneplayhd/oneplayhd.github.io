@@ -1,8 +1,6 @@
 from pathlib import Path
 import re
 
-ZIP_CACHE: dict[Path, bool] = {}
-
 
 def extrair_versao(nome: str):
     m = re.search(r"One\.repo-(\d+(?:\.\d+)*)\.zip", nome)
@@ -12,7 +10,7 @@ def extrair_versao(nome: str):
 
 
 def encontrar_repos_mais_recentes(raiz: Path) -> list[Path]:
-    encontrados = []
+    encontrados: list[tuple[tuple[int, ...], Path]] = []
 
     for item in raiz.rglob("One.repo-*.zip"):
         versao = extrair_versao(item.name)
@@ -22,14 +20,17 @@ def encontrar_repos_mais_recentes(raiz: Path) -> list[Path]:
     if not encontrados:
         return []
 
-    maior = max(v for v, _ in encontrados)
-    return [p for v, p in encontrados if v == maior]
+    maior_versao = max(v for v, _ in encontrados)
+    return [p for v, p in encontrados if v == maior_versao]
 
 
-def pasta_contem_zip(pasta: Path) -> bool:
-    if pasta not in ZIP_CACHE:
-        ZIP_CACHE[pasta] = any(pasta.rglob("*.zip"))
-    return ZIP_CACHE[pasta]
+# 🔥 REGRA CORRETA:
+# zip precisa estar DIRETAMENTE na pasta
+def pasta_contem_zip_direto(pasta: Path) -> bool:
+    return any(
+        p.is_file() and p.suffix.lower() == ".zip"
+        for p in pasta.iterdir()
+    )
 
 
 def remover_index(pasta: Path):
@@ -40,9 +41,9 @@ def remover_index(pasta: Path):
 
 
 def gerar_index(pasta: Path, raiz: Path, repos_recentes: list[Path]):
-    contem_zip = pasta_contem_zip(pasta)
+    contem_zip = pasta_contem_zip_direto(pasta)
 
-    # ❌ pasta vazia → remove index (exceto raiz)
+    # ❌ pasta sem zip → remove index (exceto raiz)
     if pasta != raiz and not contem_zip:
         remover_index(pasta)
         return
@@ -73,13 +74,18 @@ def gerar_index(pasta: Path, raiz: Path, repos_recentes: list[Path]):
             continue
 
         if item.is_dir():
-            if pasta == raiz or pasta_contem_zip(item):
+            # 🔥 só mostra pasta se:
+            # - for raiz
+            # - OU tiver zip DIRETAMENTE dentro
+            if pasta == raiz or pasta_contem_zip_direto(item):
                 linhas.append(
                     f'<a href="./{item.name}/index.html">{item.name}/</a>'
                 )
 
-        elif item.suffix.lower() == ".zip":
-            linhas.append(f'<a href="./{item.name}">{item.name}</a>')
+        elif item.is_file() and item.suffix.lower() == ".zip":
+            linhas.append(
+                f'<a href="./{item.name}">{item.name}</a>'
+            )
 
     linhas.extend([
         "</pre>",
@@ -87,28 +93,36 @@ def gerar_index(pasta: Path, raiz: Path, repos_recentes: list[Path]):
         "</html>",
     ])
 
-    # 🔥 tabela oculta fora do HTML (só na raiz)
+    # 🔥 TABELA OCULTA FORA DO HTML (SÓ NA RAIZ)
     if pasta == raiz and repos_recentes:
         linhas.append("")
         linhas.append('<div id="Repositorio-KODI" style="display:none">')
         linhas.append("<table>")
+
         for repo in repos_recentes:
             rel = repo.relative_to(raiz).as_posix()
-            linhas.append(f'<tr><td><a href="{rel}">{rel}</a></td></tr>')
+            linhas.append(
+                f'<tr><td><a href="{rel}">{rel}</a></td></tr>'
+            )
+
         linhas.append("</table>")
         linhas.append("</div>")
 
-    (pasta / "index.html").write_text("\n".join(linhas), encoding="utf-8")
+    (pasta / "index.html").write_text(
+        "\n".join(linhas),
+        encoding="utf-8"
+    )
+
     print(f"✔ index gerado: {pasta.resolve()}")
 
 
 def varrer_recursivo(pasta: Path, raiz: Path, repos_recentes: list[Path]):
-    # 🔁 PRIMEIRO processa filhos (pós-ordem)
+    # 🔁 primeiro processa filhos
     for item in pasta.iterdir():
         if item.is_dir() and not item.name.startswith("."):
             varrer_recursivo(item, raiz, repos_recentes)
 
-    # 🔥 DEPOIS decide se gera ou remove index da pasta atual
+    # 🔥 depois decide se gera ou remove index da pasta atual
     gerar_index(pasta, raiz, repos_recentes)
 
 
@@ -118,6 +132,6 @@ if __name__ == "__main__":
     repos_recentes = encontrar_repos_mais_recentes(raiz)
 
     if not repos_recentes:
-        print("⚠ Nenhum .zip encontrado. Apenas raiz mantida.")
+        print("⚠ Nenhum .zip encontrado. Apenas a raiz será mantida.")
 
     varrer_recursivo(raiz, raiz, repos_recentes)
