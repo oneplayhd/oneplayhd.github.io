@@ -32,7 +32,10 @@ jobs:
           git config user.name "github-actions"
           git config user.email "actions@github.com"
 
-          git add index.html **/index.html || true
+          # adiciona CRIAÇÕES, MODIFICAÇÕES E REMOÇÕES
+          git add -A
+
           git commit -m "Auto update index" || echo "No changes"
 
-          git push
+          git pull --rebase origin master
+          git push origin master
