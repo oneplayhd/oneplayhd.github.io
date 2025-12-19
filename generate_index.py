@@ -31,26 +31,25 @@ def pasta_tem_zip_recursivo(pasta: Path) -> bool:
     )
 
 
-def remover_index(pasta: Path):
+def gerar_ou_remover_index(pasta: Path, raiz: Path, repos_recentes: list[Path]):
+    tem_zip = pasta_tem_zip_recursivo(pasta)
     index = pasta / "index.html"
-    if index.exists():
-        index.unlink()
-        print(f"🧹 removido: {index}")
 
-
-def gerar_index(pasta: Path, raiz: Path, repos_recentes: list[Path]):
-    tem_zip_abaixo = pasta_tem_zip_recursivo(pasta)
-
-    # ❌ remover index se não houver zip em nenhum nível (exceto raiz)
-    if pasta != raiz and not tem_zip_abaixo:
-        remover_index(pasta)
+    # ❌ não deveria existir
+    if pasta != raiz and not tem_zip:
+        if index.exists():
+            index.unlink()
+            print(f"🧹 removido: {index}")
         return
 
-    # ❌ remover index da raiz se não existir zip nenhum
+    # ❌ raiz sem zip nenhum
     if pasta == raiz and not repos_recentes:
-        remover_index(pasta)
+        if index.exists():
+            index.unlink()
+            print(f"🧹 removido: {index}")
         return
 
+    # ✅ deve existir → sempre recria
     linhas = [
         "<!DOCTYPE html>",
         "<html>",
@@ -85,7 +84,6 @@ def gerar_index(pasta: Path, raiz: Path, repos_recentes: list[Path]):
         "</html>",
     ])
 
-    # 🔥 tabela oculta apenas na raiz
     if pasta == raiz and repos_recentes:
         linhas.append("")
         linhas.append('<div id="Repositorio-KODI" style="display:none">')
@@ -96,18 +94,16 @@ def gerar_index(pasta: Path, raiz: Path, repos_recentes: list[Path]):
         linhas.append("</table>")
         linhas.append("</div>")
 
-    (pasta / "index.html").write_text("\n".join(linhas), encoding="utf-8")
+    index.write_text("\n".join(linhas), encoding="utf-8")
     print(f"✔ index atualizado: {pasta}")
 
 
 def varrer_bottom_up(pasta: Path, raiz: Path, repos_recentes: list[Path]):
-    # 🔽 primeiro desce
     for sub in pasta.iterdir():
         if sub.is_dir() and not sub.name.startswith("."):
             varrer_bottom_up(sub, raiz, repos_recentes)
 
-    # 🔼 depois gera (propaga remoção para cima)
-    gerar_index(pasta, raiz, repos_recentes)
+    gerar_ou_remover_index(pasta, raiz, repos_recentes)
 
 
 if __name__ == "__main__":
@@ -115,9 +111,9 @@ if __name__ == "__main__":
 
     repos_recentes = encontrar_repos_mais_recentes(raiz)
 
-    # 🔥 bottom-up garante propagação correta
+    # 🔥 bottom-up SEM atalhos
     varrer_bottom_up(raiz, raiz, repos_recentes)
 
-    # 🔁 raiz sempre regenerada no final
+    # 🔁 raiz sempre recalculada no estado final
     repos_recentes = encontrar_repos_mais_recentes(raiz)
-    gerar_index(raiz, raiz, repos_recentes)
+    gerar_ou_remover_index(raiz, raiz, repos_recentes)
