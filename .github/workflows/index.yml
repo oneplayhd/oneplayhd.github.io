@@ -1,41 +1,158 @@
-name: Auto Generate Index
+from pathlib import Path
+import re
 
-on:
-  push:
-    paths:
-      - "**/*.zip"
-      - "**/index.html"
-  workflow_dispatch:
 
-concurrency:
-  group: auto-generate-index
-  cancel-in-progress: true
+# =============================
+# Utils
+# =============================
 
-jobs:
-  build:
-    runs-on: ubuntu-latest
+def extrair_versao(nome: str):
+    m = re.search(r"One\.repo-(\d+(?:\.\d+)*)\.zip", nome)
+    if not m:
+        return ()
+    return tuple(map(int, m.group(1).split(".")))
 
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
 
-      - uses: actions/setup-python@v5
-        with:
-          python-version: "3.x"
+def tem_zip_direto(pasta: Path) -> bool:
+    return any(
+        p.is_file() and p.suffix.lower() == ".zip"
+        for p in pasta.iterdir()
+    )
 
-      - name: Generate smart index
-        run: python generate_index.py
 
-      - name: Commit and push changes
-        run: |
-          git config user.name "github-actions"
-          git config user.email "actions@github.com"
+def tem_subindex(pasta: Path) -> bool:
+    return any(
+        (sub / "index.html").exists()
+        for sub in pasta.iterdir()
+        if sub.is_dir() and not sub.name.startswith(".")
+    )
 
-          # adiciona CRIAÇÕES, MODIFICAÇÕES E REMOÇÕES
-          git add -A
 
-          git commit -m "Auto update index (latest zip only)" || echo "No changes"
+# =============================
+# Repos mais recentes (raiz)
+# =============================
 
-          git pull --rebase origin master
-          git push origin master
+def encontrar_repos_mais_recentes(raiz: Path) -> list[Path]:
+    encontrados = []
+
+    for item in raiz.rglob("One.repo-*.zip"):
+        v = extrair_versao(item.name)
+        if v:
+            encontrados.append((v, item))
+
+    if not encontrados:
+        return []
+
+    maior = max(v for v, _ in encontrados)
+    return [p for v, p in encontrados if v == maior]
+
+
+# =============================
+# Index logic
+# =============================
+
+def gerar_ou_remover_index(pasta: Path, raiz: Path, repos_recentes: list[Path]):
+    index = pasta / "index.html"
+
+    zip_direto = tem_zip_direto(pasta)
+    sub_index = tem_subindex(pasta)
+
+    # ❌ remove index se não faz mais sentido (exceto raiz)
+    if pasta != raiz and not zip_direto and not sub_index:
+        if index.exists():
+            index.unlink()
+            print(f"🧹 removido: {index}")
+        return
+
+    # ❌ raiz sem zip nenhum → remove
+    if pasta == raiz and not repos_recentes:
+        if index.exists():
+            index.unlink()
+            print(f"🧹 removido: {index}")
+        return
+
+    # =============================
+    # Geração
+    # =============================
+
+    linhas = [
+        "<!DOCTYPE html>",
+        "<html>",
+        "<head>",
+        '<meta charset="utf-8">',
+        "<title>Directory listing</title>",
+        "</head>",
+        "<body>",
+        "<h1>Directory listing</h1>",
+        "<hr/>",
+        "<pre>",
+    ]
+
+    if pasta != raiz:
+        linhas.append('<a href="../index.html">..</a>')
+
+    for item in sorted(pasta.iterdir(), key=lambda x: (not x.is_dir(), x.name.lower())):
+        if item.name.startswith(".") or item.name == "index.html":
+            continue
+
+        if item.is_dir():
+            # mostra pasta só se ela tiver zip direto ou index próprio
+            if tem_zip_direto(item) or (item / "index.html").exists():
+                linhas.append(
+                    f'<a href="./{item.name}/index.html">{item.name}/</a>'
+                )
+
+        elif item.is_file() and item.suffix.lower() == ".zip":
+            linhas.append(
+                f'<a href="./{item.name}">{item.name}</a>'
+            )
+
+    linhas.extend([
+        "</pre>",
+        "</body>",
+        "</html>",
+    ])
+
+    # 🔥 tabela oculta só na raiz
+    if pasta == raiz and repos_recentes:
+        linhas.append("")
+        linhas.append('<div id="Repositorio-KODI" style="display:none">')
+        linhas.append("<table>")
+        for repo in repos_recentes:
+            rel = repo.relative_to(raiz).as_posix()
+            linhas.append(
+                f'<tr><td><a href="{rel}">{rel}</a></td></tr>'
+            )
+        linhas.append("</table>")
+        linhas.append("</div>")
+
+    index.write_text("\n".join(linhas), encoding="utf-8")
+    print(f"✔ index atualizado: {pasta}")
+
+
+# =============================
+# Bottom-up traversal
+# =============================
+
+def varrer_bottom_up(pasta: Path, raiz: Path, repos_recentes: list[Path]):
+    for sub in pasta.iterdir():
+        if sub.is_dir() and not sub.name.startswith("."):
+            varrer_bottom_up(sub, raiz, repos_recentes)
+
+    gerar_ou_remover_index(pasta, raiz, repos_recentes)
+
+
+# =============================
+# Main
+# =============================
+
+if __name__ == "__main__":
+    raiz = Path(".")
+
+    repos = encontrar_repos_mais_recentes(raiz)
+
+    varrer_bottom_up(raiz, raiz, repos)
+
+    # força atualização final da raiz
+    repos = encontrar_repos_mais_recentes(raiz)
+    gerar_ou_remover_index(raiz, raiz, repos)
