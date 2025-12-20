@@ -7,17 +7,13 @@ import re
 
 def extrair_versao(nome: str):
     m = re.search(r"One\.repo-(\d+(?:\.\d+)*)\.zip", nome)
-    if not m:
-        return ()
-    return tuple(map(int, m.group(1).split(".")))
-
+    return tuple(map(int, m.group(1).split("."))) if m else ()
 
 def pasta_tem_zip_recursivo(pasta: Path) -> bool:
     return any(p.suffix.lower() == ".zip" for p in pasta.rglob("*.zip"))
 
-
 # =============================
-# Repositório mais recente
+# Repositórios mais recentes
 # =============================
 
 def encontrar_repos_mais_recentes(raiz: Path) -> list[Path]:
@@ -34,12 +30,11 @@ def encontrar_repos_mais_recentes(raiz: Path) -> list[Path]:
     maior = max(v for v, _ in encontrados)
     return [p for v, p in encontrados if v == maior]
 
-
 # =============================
 # Index handling
 # =============================
 
-def gerar_ou_remover_index(pasta: Path, raiz: Path, repos_recentes: list[Path]):
+def gerar_ou_remover_index(pasta: Path, raiz: Path):
     index = pasta / "index.html"
     tem_zip = pasta_tem_zip_recursivo(pasta)
 
@@ -50,6 +45,8 @@ def gerar_ou_remover_index(pasta: Path, raiz: Path, repos_recentes: list[Path]):
             print(f"🧹 removido: {index}")
         return
 
+    repos_recentes = encontrar_repos_mais_recentes(raiz)
+
     # ❌ raiz sem zip nenhum → remove index
     if pasta == raiz and not repos_recentes:
         if index.exists():
@@ -57,7 +54,6 @@ def gerar_ou_remover_index(pasta: Path, raiz: Path, repos_recentes: list[Path]):
             print(f"🧹 removido: {index}")
         return
 
-    # ✅ cria / recria index
     linhas = [
         "<!DOCTYPE html>",
         "<html>",
@@ -79,10 +75,9 @@ def gerar_ou_remover_index(pasta: Path, raiz: Path, repos_recentes: list[Path]):
             continue
 
         if item.is_dir():
-            # lista só se houver zip dentro
             if pasta_tem_zip_recursivo(item):
                 linhas.append(f'<a href="./{item.name}/index.html">{item.name}/</a>')
-        elif item.is_file() and item.suffix.lower() == ".zip":
+        elif item.suffix.lower() == ".zip":
             linhas.append(f'<a href="./{item.name}">{item.name}</a>')
 
     linhas.extend([
@@ -91,9 +86,10 @@ def gerar_ou_remover_index(pasta: Path, raiz: Path, repos_recentes: list[Path]):
         "</html>",
     ])
 
-    # 🔥 tabela técnica FORA do HTML (apenas na raiz)
+    # 🔥 BLOCO FORA DO HTML (intencional)
     if pasta == raiz and repos_recentes:
-        linhas.append("")
+        linhas.append("")  # separador visual
+        linhas.append("<!-- REPOSITORIO KODI (FORA DO HTML) -->")
         linhas.append('<div id="Repositorio-KODI" style="display:none">')
         linhas.append("<table>")
         for repo in repos_recentes:
@@ -105,18 +101,16 @@ def gerar_ou_remover_index(pasta: Path, raiz: Path, repos_recentes: list[Path]):
     index.write_text("\n".join(linhas), encoding="utf-8")
     print(f"✔ index atualizado: {pasta}")
 
-
 # =============================
-# Varredura bottom-up (SEM raiz)
+# Varredura bottom-up
 # =============================
 
-def varrer_bottom_up(pasta: Path, raiz: Path, repos_recentes: list[Path]):
+def varrer_bottom_up(pasta: Path, raiz: Path):
     for sub in pasta.iterdir():
         if sub.is_dir() and not sub.name.startswith("."):
-            varrer_bottom_up(sub, raiz, repos_recentes)
+            varrer_bottom_up(sub, raiz)
 
-    gerar_ou_remover_index(pasta, raiz, repos_recentes)
-
+    gerar_ou_remover_index(pasta, raiz)
 
 # =============================
 # Main
@@ -124,14 +118,5 @@ def varrer_bottom_up(pasta: Path, raiz: Path, repos_recentes: list[Path]):
 
 if __name__ == "__main__":
     raiz = Path(".")
-
-    # calcula versão mais recente
-    repos_recentes = encontrar_repos_mais_recentes(raiz)
-
-    # 🔥 percorre APENAS subpastas (raiz não entra aqui)
-    for sub in raiz.iterdir():
-        if sub.is_dir() and not sub.name.startswith("."):
-            varrer_bottom_up(sub, raiz, repos_recentes)
-
-    # 🔥 gera raiz UMA ÚNICA VEZ
-    gerar_ou_remover_index(raiz, raiz, repos_recentes)
+    varrer_bottom_up(raiz, raiz)
+    gerar_ou_remover_index(raiz, raiz)
