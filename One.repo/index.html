@@ -23,13 +23,12 @@ td { padding:5px 10px; border:1px solid #ddd; }
 <pre id='listing'>
 📦 <a href="./One.repo-1.11.zip">One.repo-1.11.zip</a>
 📦 <a href="./One.repo-1.12.zip">One.repo-1.12.zip</a>
-📦 <a href="./One.repo-1.13.zip">One.repo-1.13.zip</a>
 📦 <a href="./One.repo-1.15.zip">One.repo-1.15.zip</a>
 </pre>
 <script>
 const searchInput = document.getElementById('search');
 const listing = document.getElementById('listing');
-const items = [['one.repo-1.11.zip', '📦 <a href="./One.repo-1.11.zip">One.repo-1.11.zip</a>'], ['one.repo-1.12.zip', '📦 <a href="./One.repo-1.12.zip">One.repo-1.12.zip</a>'], ['one.repo-1.13.zip', '📦 <a href="./One.repo-1.13.zip">One.repo-1.13.zip</a>'], ['one.repo-1.15.zip', '📦 <a href="./One.repo-1.15.zip">One.repo-1.15.zip</a>']];
+const items = [['one.repo-1.11.zip', '📦 <a href="./One.repo-1.11.zip">One.repo-1.11.zip</a>'], ['one.repo-1.12.zip', '📦 <a href="./One.repo-1.12.zip">One.repo-1.12.zip</a>'], ['one.repo-1.15.zip', '📦 <a href="./One.repo-1.15.zip">One.repo-1.15.zip</a>']];
 function removerAcentos(str) {
   return str.normalize('NFD').replace(/\p{Diacritic}/gu, '').toLowerCase();
 }
