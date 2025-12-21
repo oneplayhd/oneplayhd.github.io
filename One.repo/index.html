@@ -22,12 +22,11 @@ td { padding:5px 10px; border:1px solid #ddd; }
 <input type="text" id="search" placeholder="Pesquisar arquivos ou pastas...">
 <pre id='listing'>
 📦 <a href="./One.repo-1.11.zip">One.repo-1.11.zip</a>
-📦 <a href="./One.repo-1.15.zip">One.repo-1.15.zip</a>
 </pre>
 <script>
 const searchInput = document.getElementById('search');
 const listing = document.getElementById('listing');
-const items = [['one.repo-1.11.zip', '📦 <a href="./One.repo-1.11.zip">One.repo-1.11.zip</a>'], ['one.repo-1.15.zip', '📦 <a href="./One.repo-1.15.zip">One.repo-1.15.zip</a>']];
+const items = [['one.repo-1.11.zip', '📦 <a href="./One.repo-1.11.zip">One.repo-1.11.zip</a>']];
 function removerAcentos(str) {
   return str.normalize('NFD').replace(/\p{Diacritic}/gu, '').toLowerCase();
 }
