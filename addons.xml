@@ -614,12 +614,12 @@ provider-name="jurialmunkey">
   </assets>
 </extension>
 </addon>
-<addon id="plugin.video.thethunder" version="1.2.4" name="[COLOR violet]THUNDER[/COLOR]" provider-name="OnePlay Team">
+<addon id="plugin.video.thethunder" version="1.2.5" name="[COLOR violet]THUNDER[/COLOR]" provider-name="OnePlay Team">
     <requires>
         <import addon="script.module.requests" />
+        <import addon="script.module.resolveurl" />
         <import addon="script.module.kodi-helper" />
-        <import addon="service.subtitles.legendei" />
-        <import addon="xbmc.python" version="3.0.0" />
+        <import addon="service.subtitles.legendei" />        
     </requires>
     <extension point="xbmc.python.pluginsource" library="thethunder.py">
         <provides>video</provides>
