@@ -186,3 +186,4 @@ if __name__ == "__main__":
     raiz = Path(".")
     varrer_bottom_up(raiz, raiz)
     gerar_ou_remover_index(raiz, raiz)
+
