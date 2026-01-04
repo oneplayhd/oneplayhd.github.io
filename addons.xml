@@ -730,7 +730,7 @@ v1.0.0
       </assets>
     </extension>
   </addon>
-  <addon id="plugin.video.thethunder" version="1.2.6" name="[COLOR violet]THUNDER[/COLOR]" provider-name="OnePlay Team">
+  <addon id="plugin.video.thethunder" version="1.2.7" name="[COLOR violet]THUNDER[/COLOR]" provider-name="OnePlay Team">
     <requires>
       <import addon="script.module.requests"/>
       <import addon="script.module.resolveurl"/>
@@ -754,6 +754,7 @@ v1.0.0
         <fanart>fanart.jpg</fanart>
       </assets>
     </extension>
+    <version>1.2.7</version>
   </addon>
   <addon id="plugin.video.tubemusic" name="Tube Music" version="1.0.6" provider-name="OnePlay team">
     <requires>
