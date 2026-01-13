@@ -340,7 +340,7 @@
       </assets>
     </extension>
   </addon>
-  <addon id="plugin.video.doramasplus" version="1.0.6" name="[COLOR pink]DORAMAS[/COLOR]" provider-name="OnePlay Team">
+  <addon id="plugin.video.doramasplus" version="1.0.7" name="[COLOR pink]DORAMAS[/COLOR]" provider-name="OnePlay Team">
     <requires>
       <import addon="script.module.simplejson"/>
       <import addon="script.module.six"/>
@@ -363,7 +363,6 @@
         <fanart>fanart.jpg</fanart>
       </assets>
     </extension>
-    <version>1.0.6</version>
   </addon>
   <addon id="plugin.video.f4mTester" version="4.2.5" name="f4mTester" provider-name="Joel">
     <requires>
