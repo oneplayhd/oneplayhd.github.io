@@ -447,7 +447,6 @@ v1.0.8.matrix
 - Correção fonte
 	</news>
     </extension>
-    <version>1.0.9+matrix.1</version>
   </addon>
   <addon id="plugin.video.doramasplus" version="1.0.6" name="[COLOR pink]DORAMAS[/COLOR]" provider-name="OnePlay Team">
     <requires>
