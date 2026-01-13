@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <addon id="repository.mirror.mit_omega"
 		name="Kodi Add-on repository OMEGA"
-		version="1.0.0"
+		version="1.0.1"
 		provider-name="zoreu, Gujal, MIT Omega Mirror">
   <requires>
     <import addon="xbmc.addon" version="12.0.0"/>
@@ -31,11 +31,17 @@
 			<datadir zip="true">https://raw.githubusercontent.com/vikingskoditeam/vikingskoditeam.github.io/master/matrix</datadir>
 			<hashes>false</hashes>
 		</dir>
+		<dir minversion="18.9.1">
+			<info compressed="false">https://raw.githubusercontent.com/skyrisk/brazucaplay/master/addons/repo/addons_matrix.xml</info>
+			<checksum>https://raw.githubusercontent.com/skyrisk/brazucaplay/master/addons/repo/addons_matrix.xml.md5</checksum>
+			<datadir zip="true">https://raw.githubusercontent.com/skyrisk/brazucaplay/master/addons/repo/Plugins/</datadir>
+			<hashes>false</hashes>
+		</dir>			
 		<dir minversion="18.9.9">
 			<info compressed="false">https://raw.githubusercontent.com/thecrewwh/zips/master/matrix/_zip/addons.xml</info>
 			<checksum>https://raw.githubusercontent.com/thecrewwh/zips/master/matrix/_zip/addons.xml.md5</checksum>
 			<datadir zip="true">https://raw.githubusercontent.com/thecrewwh/zips/master/matrix/_zip</datadir>
-		</dir>
+		</dir>	
 		<dir>
 			<info compressed="false">https://raw.githubusercontent.com/unhingedthemes/zips/main/_zips/addons.xml</info>
 			<checksum>https://raw.githubusercontent.com/unhingedthemes/zips/main/_zips/addons.xml.md5</checksum>
