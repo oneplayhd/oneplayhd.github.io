@@ -1308,7 +1308,7 @@
       </assets>
     </extension>
   </addon>
-  <addon id="script.limpeza.Matrix" name="[COLORred]Script[/COLOR] [COLORgreen]Limpeza[/COLOR]" provider-name="BOSS" version="1.1.3">
+  <addon id="script.limpeza.Matrix" name="[COLORred]Script[/COLOR] [COLORgreen]Limpeza[/COLOR]" provider-name="BOSS" version="1.1.8">
     <requires>
       <import addon="xbmc.python" version="3.0.0"/>
     </requires>
@@ -1320,8 +1320,12 @@
     </extension>
     <extension point="xbmc.addon.metadata">
       <platform>all</platform>
-      <summary lang="en_GB">Clean up temporary files in Kodi (19–21.3).</summary>
-      <description lang="en_GB">Safely clean temporary files (cache, temp, packages, thumbnails) in Kodi 19–21.3. Advanced options are hidden behind Kodi's settings level (Advanced/Expert).</description>
+      <summary lang="en_GB">Clean up temporary files in Kodi (19–21.x).</summary>
+      <summary lang="pt_BR">Limpeza de arquivos temporários no Kodi (19–21.x).</summary>
+      <summary lang="es_ES">Limpieza de archivos temporales en Kodi (19–21.x).</summary>
+      <description lang="en_GB">Safely clean temporary files (cache, temp, packages and thumbnails). Includes checks for broken sources, unused repositories and addons without repository.</description>
+      <description lang="pt_BR">Limpa com segurança arquivos temporários (cache, temp, pacotes e miniaturas). Inclui verificações de fontes com problema, repositórios não usados e add-ons sem repositório.</description>
+      <description lang="es_ES">Limpia de forma segura archivos temporales (caché, temporales, paquetes y miniaturas). Incluye comprobaciones de fuentes dañadas, repositorios no usados y add-ons sin repositorio.</description>
       <license>GNU GENERAL PUBLIC LICENSE</license>
       <assets>
         <icon>icon.png</icon>
