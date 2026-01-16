@@ -340,14 +340,14 @@
       </assets>
     </extension>
   </addon>
-  <addon id="plugin.video.doramasplus" version="1.0.8" name="[COLOR pink]DORAMAS[/COLOR]" provider-name="OnePlay Team">
+  <addon id="plugin.video.doramasplus" version="1.0.9" name="[COLOR pink]DORAMAS[/COLOR]" provider-name="OnePlay Team">
     <requires>
       <import addon="script.module.simplejson"/>
       <import addon="script.module.six"/>
       <import addon="script.module.kodi-six"/>
       <import addon="script.module.requests"/>
       <import addon="script.module.beautifulsoup4"/>
-      <import addon="script.module.resolveurl"/>
+      <import addon="script.module.resolveurl.fork"/>
     </requires>
     <extension point="xbmc.python.pluginsource" library="default.py">
       <provides>video</provides>
