@@ -1437,7 +1437,7 @@
       </assets>
     </extension>
   </addon>
-  <addon id="service.subtitles.legendei" name="Legendei" version="0.0.6" provider-name="zoreu">
+  <addon id="service.subtitles.legendei" name="Legendei" version="0.0.7" provider-name="zoreu">
     <requires>
       <import addon="script.module.kodi-six"/>
       <import addon="script.module.beautifulsoup4"/>
