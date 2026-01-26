@@ -432,7 +432,7 @@
       </assets>
     </extension>
   </addon>
-  <addon id="plugin.video.kingiptv" version="0.0.4" name="KING IPTV" provider-name="Joel">
+  <addon id="plugin.video.kingiptv" version="0.0.5" name="KING IPTV" provider-name="Joel">
     <requires>
       <import addon="script.module.simplejson"/>
       <import addon="script.module.six"/>
@@ -459,7 +459,6 @@
         <fanart>fanart.jpg</fanart>
       </assets>
     </extension>
-    <version>0.0.4</version>
   </addon>
   <addon id="plugin.video.oneplayvip" version="0.0.3" name="[COLOR aquamarine][B]ONE[/COLOR][COLOR white]PLAY [COLOR aquamarine]VIP[/COLOR][/B][/COLOR]" provider-name="Equipe OnePlay">
     <requires>
