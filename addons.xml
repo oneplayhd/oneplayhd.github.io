@@ -43,6 +43,19 @@
       </assets>
     </extension>
   </addon>
+  <addon id="addon.dns" name="CLOUDFLARE DNS" version="1.0.0" provider-name="Joel">
+    <requires>
+      <import addon="xbmc.python" version="3.0.0"/>
+    </requires>
+    <extension point="xbmc.service" library="service.py"/>
+    <extension point="xbmc.addon.metadata">
+      <summary>Proxy com DNS Cloudflare</summary>
+      <platform>all</platform>
+      <assets>
+        <icon>resources/icon.png</icon>
+      </assets>
+    </extension>
+  </addon>
   <addon id="context.themoviedb.helper" version="1.1.1" name="TMDbHelper - Additional Context Menu Items" provider-name="jurialmunkey">
     <requires>
       <import addon="xbmc.python" version="3.0.0"/>
