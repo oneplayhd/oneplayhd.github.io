@@ -1127,10 +1127,10 @@
       </assets>
     </extension>
   </addon>
-  <addon id="plugin.video.yt.premium" name="YouTube Premium" version="0.0.1" provider-name="Diggz, Joel">
+  <addon id="plugin.video.yt.premium" name="YouTube Premium" version="0.0.2" provider-name="Diggz, Joel">
     <requires>
       <import addon="xbmc.python" version="3.0.0"/>
-      <import addon="plugin.video.youtube" version="7.4.0.1"/>
+      <import addon="plugin.video.youtubek2"/>
     </requires>
     <extension point="xbmc.python.pluginsource" library="default.py">
       <provides>video</provides>
