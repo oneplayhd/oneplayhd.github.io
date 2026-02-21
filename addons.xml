@@ -1596,7 +1596,7 @@
       </assets>
     </extension>
   </addon>
-  <addon id="script.module.resolveurl.fork" name="ResolveURL" version="5.1.191" provider-name="gujal">
+  <addon id="script.module.resolveurl.fork" name="ResolveURL" version="5.1.192" provider-name="gujal">
     <requires>
       <!-- <import addon="xbmc.python" version="3.0.0" /> -->
       <import addon="script.module.six"/>
