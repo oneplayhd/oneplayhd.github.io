@@ -499,7 +499,7 @@
       </assets>
     </extension>
   </addon>
-  <addon id="plugin.video.oneplayvip" version="0.1.2" name="[COLOR aquamarine][B]ONE[COLOR white]PLAY [COLOR aquamarine]VIP[/B][/COLOR]" provider-name="OnePlay">
+  <addon id="plugin.video.oneplayvip" version="0.1.3" name="[COLOR aquamarine][B]ONE[COLOR white]PLAY [COLOR aquamarine]VIP[/B][/COLOR]" provider-name="OnePlay">
     <requires>
       <import addon="xbmc.python" version="3.0.0"/>
       <import addon="script.module.requests"/>
