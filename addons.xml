@@ -499,7 +499,7 @@
       </assets>
     </extension>
   </addon>
-  <addon id="plugin.video.oneplayvip" version="0.2.0" name="[COLOR aquamarine][B]ONE[COLOR white]PLAY [COLOR aquamarine]VIP[/B][/COLOR]" provider-name="OnePlay">
+  <addon id="plugin.video.oneplayvip" version="0.2.1" name="[COLOR aquamarine][B]ONE[COLOR white]PLAY [COLOR aquamarine]VIP[/B][/COLOR]" provider-name="OnePlay">
     <requires>
       <import addon="xbmc.python" version="3.0.0"/>
       <import addon="script.module.requests"/>
@@ -509,6 +509,7 @@
     <extension point="xbmc.python.pluginsource" library="main.py">
       <provides>video</provides>
     </extension>
+    <extension point="xbmc.service" library="service.py" start="startup"/>
     <extension point="xbmc.addon.metadata">
       <summary>OnePlay VIP é um plugin baseado no addon para Xtream Codes com TV, Filmes, Series, EPG e Busca Global</summary>
       <description>Insira usuario e senha para acessar canais, VOD, series com temporadas/episodios, EPG e busca global.</description>
