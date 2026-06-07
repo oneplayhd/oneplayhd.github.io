@@ -6,6 +6,7 @@ import unicodedata
 from urllib.parse import quote
 
 REPO_ZIP_RE = re.compile(r"One\.repo-(\d+(?:\.\d+)*)\.zip$", re.IGNORECASE)
+README_NAME = "README.md"
 
 
 # Utils
@@ -41,6 +42,130 @@ def caminho_publicavel(path: Path, raiz: Path) -> bool:
     except ValueError:
         return False
     return not any(parte.startswith(".") for parte in partes)
+
+
+# README.md da raiz exibido somente na página inicial.
+def markdown_inline(texto: str) -> str:
+    """Renderização simples e segura para links Markdown em linha."""
+    marcador = "\u0000MDLINK{}\u0000"
+    links = []
+
+    def repl(match):
+        rotulo = html.escape(match.group(1), quote=True)
+        url = match.group(2).strip()
+        # Mantém conservador: permite links relativos e URLs comuns, sempre escapados.
+        href = html.escape(url, quote=True)
+        links.append(f'<a href="{href}">{rotulo}</a>')
+        return marcador.format(len(links) - 1)
+
+    texto_marcado = re.sub(r"\[([^\]]+)\]\(([^)]+)\)", repl, texto)
+    texto_seguro = html.escape(texto_marcado, quote=True)
+
+    for i, link in enumerate(links):
+        texto_seguro = texto_seguro.replace(html.escape(marcador.format(i), quote=True), link)
+
+    # Negrito/itálico simples, depois do escape para evitar HTML cru.
+    texto_seguro = re.sub(r"\*\*([^*]+)\*\*", r"<strong>\1</strong>", texto_seguro)
+    texto_seguro = re.sub(r"`([^`]+)`", r"<code>\1</code>", texto_seguro)
+    return texto_seguro
+
+
+def fechar_lista(saida, tipo_lista) -> None:
+    if tipo_lista:
+        saida.append(f"</{tipo_lista}>")
+
+
+def renderizar_readme_markdown(caminho: Path) -> str:
+    """
+    Renderizador Markdown básico, sem dependências externas.
+    Suporta títulos, parágrafos, listas simples, blocos de código e links.
+    Se o README tiver algo avançado, ainda aparece de forma segura.
+    """
+    texto = caminho.read_text(encoding="utf-8", errors="replace")
+    linhas = texto.splitlines()
+    saida = []
+    tipo_lista = None
+    em_codigo = False
+    codigo = []
+
+    for linha in linhas:
+        raw = linha.rstrip("\n")
+        stripped = raw.strip()
+
+        if stripped.startswith("```"):
+            if em_codigo:
+                saida.append("<pre><code>" + html.escape("\n".join(codigo), quote=False) + "</code></pre>")
+                codigo = []
+                em_codigo = False
+            else:
+                fechar_lista(saida, tipo_lista)
+                tipo_lista = None
+                em_codigo = True
+            continue
+
+        if em_codigo:
+            codigo.append(raw)
+            continue
+
+        if not stripped:
+            fechar_lista(saida, tipo_lista)
+            tipo_lista = None
+            continue
+
+        heading = re.match(r"^(#{1,6})\s+(.+)$", stripped)
+        if heading:
+            fechar_lista(saida, tipo_lista)
+            tipo_lista = None
+            nivel = len(heading.group(1))
+            conteudo = markdown_inline(heading.group(2).strip())
+            saida.append(f"<h{nivel}>{conteudo}</h{nivel}>")
+            continue
+
+        bullet = re.match(r"^[-*+]\s+(.+)$", stripped)
+        if bullet:
+            if tipo_lista != "ul":
+                fechar_lista(saida, tipo_lista)
+                tipo_lista = "ul"
+                saida.append("<ul>")
+            saida.append(f"<li>{markdown_inline(bullet.group(1).strip())}</li>")
+            continue
+
+        numero = re.match(r"^\d+[.)]\s+(.+)$", stripped)
+        if numero:
+            if tipo_lista != "ol":
+                fechar_lista(saida, tipo_lista)
+                tipo_lista = "ol"
+                saida.append("<ol>")
+            saida.append(f"<li>{markdown_inline(numero.group(1).strip())}</li>")
+            continue
+
+        fechar_lista(saida, tipo_lista)
+        tipo_lista = None
+        saida.append(f"<p>{markdown_inline(stripped)}</p>")
+
+    if em_codigo:
+        saida.append("<pre><code>" + html.escape("\n".join(codigo), quote=False) + "</code></pre>")
+
+    fechar_lista(saida, tipo_lista)
+    return "\n".join(saida).strip()
+
+
+def bloco_readme_raiz(raiz: Path) -> list[str]:
+    readme = raiz / README_NAME
+    if not readme.is_file():
+        return []
+
+    conteudo = renderizar_readme_markdown(readme)
+    if not conteudo:
+        return []
+
+    return [
+        "<!-- README.md (PAGINA INICIAL) -->",
+        '<section class="readme-box">',
+        conteudo,
+        "</section>",
+        "<hr/>",
+    ]
 
 
 # Scan único (performance)
@@ -126,12 +251,29 @@ def gerar_ou_remover_index(
         "#search { padding:8px 12px; width:min(320px, 100%); border-radius:6px; border:1px solid #ccc; margin-bottom:16px; box-sizing:border-box; }",
         ".voltar { display:inline-block; margin-bottom:16px; padding:6px 14px; border-radius:999px; border:1px solid #0066cc; color:#0066cc; transition:.2s; }",
         ".voltar:hover { background:#0066cc; color:#fff; text-decoration:none; }",
+    ]
+
+    # Estilo extra somente na página inicial, quando o README.md pode aparecer.
+    if pasta == raiz:
+        linhas_html.extend([
+            ".readme-box { background:#fff; padding:18px 20px; border-radius:12px; box-shadow:0 4px 14px rgba(0,0,0,.08); margin:0 0 18px; max-width:980px; }",
+            ".readme-box h1, .readme-box h2, .readme-box h3 { margin-top:0.75em; }",
+            ".readme-box p { line-height:1.6; }",
+            ".readme-box code { background:#f1f3f5; padding:2px 5px; border-radius:5px; }",
+            ".readme-box pre { box-shadow:none; border:1px solid #e5e7eb; }",
+            ".readme-box ul, .readme-box ol { line-height:1.6; }",
+        ])
+
+    linhas_html.extend([
         "</style>",
         "</head>",
         "<body>",
         "<h1>Directory listing</h1>",
         "<hr/>",
-    ]
+    ])
+
+    if pasta == raiz:
+        linhas_html.extend(bloco_readme_raiz(raiz))
 
     if pasta != raiz:
         linhas_html.append('<a class="voltar" href="../index.html">← Voltar</a>')
