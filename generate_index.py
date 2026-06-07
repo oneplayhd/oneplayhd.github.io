@@ -9,6 +9,7 @@ from urllib.parse import quote, urlparse
 REPO_ZIP_RE = re.compile(r"One\.repo-(\d+(?:\.\d+)*)\.zip$", re.IGNORECASE)
 README_NAME = "README.md"
 KODI_BLOCK_COMMENT = "<!-- REPOSITORIO KODI (FORA DO HTML) -->"
+TOPO_BADGE = "📦 Repositório Kodi • GitHub Pages"
 
 
 # Utils
@@ -396,6 +397,7 @@ def gerar_index_raiz(raiz: Path, pastas_com_zip: set[Path], todos_zips: list[Pat
     css = css_base() + [
         "body { min-height:100vh; background:linear-gradient(135deg,#07111f 0%,#13263b 42%,#f4f6f8 42%,#f4f6f8 100%); }",
         ".page-shell { width:min(1180px, calc(100% - 32px)); margin:0 auto; padding:32px 0 44px; }",
+        ".top-badge { display:inline-flex; align-items:center; gap:8px; margin:0 0 18px; padding:7px 12px; border:1px solid rgba(255,255,255,.24); border-radius:999px; background:rgba(255,255,255,.08); color:#fff; font-size:13px; letter-spacing:.02em; }",
         ".hero { color:#fff; padding:30px 0 26px; }",
         ".badge { display:inline-flex; align-items:center; gap:8px; padding:7px 12px; border:1px solid rgba(255,255,255,.24); border-radius:999px; background:rgba(255,255,255,.08); font-size:13px; letter-spacing:.02em; }",
         ".hero h1 { color:#fff; margin:16px 0 8px; font-size:clamp(30px, 5vw, 52px); line-height:1.03; }",
@@ -430,7 +432,7 @@ def gerar_index_raiz(raiz: Path, pastas_com_zip: set[Path], todos_zips: list[Pat
         ".entry small { display:block; margin-top:2px; color:#6b7280; font-weight:500; }",
         ".empty { padding:18px; text-align:center; color:#6b7280; border:1px dashed #d1d5db; border-radius:14px; background:#f9fafb; }",
         ".footer-note { margin-top:18px; color:#6b7280; font-size:12px; text-align:center; }",
-        "@media (max-width:900px) { body { background:#f4f6f8; } .hero { color:#111827; padding-top:20px; } .hero h1 { color:#111827; } .hero p { color:#4b5563; } .badge { color:#1f2937; border-color:#d1d5db; background:#fff; } .layout { grid-template-columns:1fr; } }",
+        "@media (max-width:900px) { body { background:#f4f6f8; } .top-badge,.badge { color:#1f2937; border-color:#d1d5db; background:#fff; } .layout { grid-template-columns:1fr; } }",
         "@media (max-width:560px) { .page-shell { width:min(100% - 20px, 1180px); padding-top:18px; } .readme-card,.panel { padding:16px; border-radius:14px; } .stats { grid-template-columns:1fr; } }",
     ]
 
@@ -447,6 +449,7 @@ def gerar_index_raiz(raiz: Path, pastas_com_zip: set[Path], todos_zips: list[Pat
         "</head>",
         "<body>",
         '<main class="page-shell">',
+        f'<div class="top-badge">{html.escape(TOPO_BADGE, quote=False)}</div>',
         '<section class="layout">',
         '<div class="card">',
     ]
@@ -592,7 +595,7 @@ def gerar_index_subpasta(pasta: Path, raiz: Path, pastas_com_zip: set[Path]) -> 
         "<body>",
         '<main class="page-shell">',
         '<section class="hero">',
-        '<div class="badge">📂 Navegação do repositório</div>',
+        f'<div class="badge">{html.escape(TOPO_BADGE, quote=False)}</div>',
         f"<h1>{html.escape(titulo_pasta, quote=False)}</h1>",
         "<p>Arquivos desta pasta organizados para instalação e download. Use a busca para localizar rapidamente o pacote desejado.</p>",
         "</section>",
