@@ -253,6 +253,49 @@ def renderizar_readme_markdown(caminho: Path) -> str:
     return "\n".join(saida).strip()
 
 
+
+def texto_limpo_para_titulo(texto: str) -> str:
+    """Remove HTML/Markdown simples para usar conteúdo do README como <title>."""
+    texto = re.sub(r"<[^>]+>", "", texto)
+    texto = html.unescape(texto)
+    texto = re.sub(r"[`*_]+", "", texto)
+    texto = re.sub(r"\s+", " ", texto).strip()
+    return texto
+
+
+def extrair_titulo_readme(raiz: Path) -> str:
+    """
+    Usa o primeiro título do README.md como título do site.
+    Nada do nome exibido fica fixo no código: alterou o README, alterou o título gerado.
+    """
+    readme = raiz / README_NAME
+    if not readme.is_file():
+        return ""
+
+    texto = readme.read_text(encoding="utf-8", errors="replace")
+
+    # Prioriza título Markdown: # Meu Repositório
+    for linha in texto.splitlines():
+        m = re.match(r"^\s*#\s+(.+?)\s*$", linha)
+        if m:
+            titulo = texto_limpo_para_titulo(m.group(1))
+            if titulo:
+                return titulo
+
+    # Também aceita README escrito com HTML: <h1>Meu Repositório</h1>
+    m = re.search(r"<h1\b[^>]*>(.*?)</h1>", texto, flags=re.IGNORECASE | re.DOTALL)
+    if m:
+        titulo = texto_limpo_para_titulo(m.group(1))
+        if titulo:
+            return titulo
+
+    return ""
+
+
+def titulo_site(raiz: Path) -> str:
+    """Título genérico com fallback neutro; nome do projeto vem do README.md quando existir."""
+    return extrair_titulo_readme(raiz) or "Repositório"
+
 def bloco_readme_raiz(raiz: Path) -> list[str]:
     readme = raiz / README_NAME
     if not readme.is_file():
@@ -348,6 +391,7 @@ def gerar_index_raiz(raiz: Path, pastas_com_zip: set[Path], todos_zips: list[Pat
     total_pastas = sum(1 for tipo, _ in itens if tipo == "dir")
     total_zips_raiz = sum(1 for tipo, _ in itens if tipo == "zip")
     total_zips_geral = len(todos_zips)
+    titulo = titulo_site(raiz)
 
     css = css_base() + [
         "body { min-height:100vh; background:linear-gradient(135deg,#07111f 0%,#13263b 42%,#f4f6f8 42%,#f4f6f8 100%); }",
@@ -396,7 +440,7 @@ def gerar_index_raiz(raiz: Path, pastas_com_zip: set[Path], todos_zips: list[Pat
         "<head>",
         '<meta charset="utf-8">',
         '<meta name="viewport" content="width=device-width, initial-scale=1">',
-        "<title>Repositório OnePlayHD</title>",
+        f"<title>{html.escape(titulo, quote=False)}</title>",
         "<style>",
         *css,
         "</style>",
@@ -497,6 +541,7 @@ def gerar_index_subpasta(pasta: Path, raiz: Path, pastas_com_zip: set[Path]) -> 
     total_zips = sum(1 for tipo, _ in itens if tipo == "zip")
     rel = pasta.relative_to(raiz).as_posix()
     titulo_pasta = pasta.name if pasta != raiz else "Início"
+    titulo = titulo_site(raiz)
 
     css = css_base() + [
         "body { min-height:100vh; background:linear-gradient(135deg,#07111f 0%,#13263b 38%,#f4f6f8 38%,#f4f6f8 100%); }",
@@ -539,7 +584,7 @@ def gerar_index_subpasta(pasta: Path, raiz: Path, pastas_com_zip: set[Path]) -> 
         "<head>",
         '<meta charset="utf-8">',
         '<meta name="viewport" content="width=device-width, initial-scale=1">',
-        f"<title>{html.escape(titulo_pasta, quote=False)} • Repositório OnePlayHD</title>",
+        f"<title>{html.escape(titulo_pasta, quote=False)} • {html.escape(titulo, quote=False)}</title>",
         "<style>",
         *css,
         "</style>",
