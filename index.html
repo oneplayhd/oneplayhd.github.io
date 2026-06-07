@@ -3,128 +3,178 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Directory listing</title>
+<title>Repositório OnePlayHD</title>
 <style>
-body { font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif; background:#f4f6f8; color:#222; padding:24px; }
-h1 { margin-bottom:8px; }
-hr { border:0; border-top:1px solid #ddd; margin:12px 0 20px; }
-pre { background:#fff; padding:14px; border-radius:10px; box-shadow:0 4px 14px rgba(0,0,0,.08); line-height:1.6; overflow:auto; }
-a { color:#0066cc; text-decoration:none; font-weight:500; }
+* { box-sizing:border-box; }
+body { margin:0; font-family:system-ui,-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif; background:#f4f6f8; color:#1f2937; }
+a { color:#0066cc; text-decoration:none; font-weight:600; }
 a:hover { text-decoration:underline; }
-#search { padding:8px 12px; width:min(320px, 100%); border-radius:6px; border:1px solid #ccc; margin-bottom:16px; box-sizing:border-box; }
-.voltar { display:inline-block; margin-bottom:16px; padding:6px 14px; border-radius:999px; border:1px solid #0066cc; color:#0066cc; transition:.2s; }
-.voltar:hover { background:#0066cc; color:#fff; text-decoration:none; }
-.readme-box { background:#fff; padding:18px 20px; border-radius:12px; box-shadow:0 4px 14px rgba(0,0,0,.08); margin:0 0 18px; max-width:980px; }
-.readme-box h1, .readme-box h2, .readme-box h3 { margin-top:0.75em; }
-.readme-box p { line-height:1.6; }
-.readme-box code { background:#f1f3f5; padding:2px 5px; border-radius:5px; }
-.readme-box pre { box-shadow:none; border:1px solid #e5e7eb; }
-.readme-box ul, .readme-box ol { line-height:1.6; }
+h1,h2,h3 { color:#111827; }
+body { min-height:100vh; background:linear-gradient(135deg,#07111f 0%,#13263b 42%,#f4f6f8 42%,#f4f6f8 100%); }
+.page-shell { width:min(1180px, calc(100% - 32px)); margin:0 auto; padding:32px 0 44px; }
+.hero { color:#fff; padding:30px 0 26px; }
+.badge { display:inline-flex; align-items:center; gap:8px; padding:7px 12px; border:1px solid rgba(255,255,255,.24); border-radius:999px; background:rgba(255,255,255,.08); font-size:13px; letter-spacing:.02em; }
+.hero h1 { color:#fff; margin:16px 0 8px; font-size:clamp(30px, 5vw, 52px); line-height:1.03; }
+.hero p { max-width:760px; margin:0; color:#dce8f7; font-size:17px; line-height:1.6; }
+.layout { display:grid; grid-template-columns:minmax(0, 1.05fr) minmax(300px, .95fr); gap:22px; align-items:start; }
+.card { background:#fff; border:1px solid #e5e7eb; border-radius:18px; box-shadow:0 18px 44px rgba(15,23,42,.12); }
+.readme-card { padding:24px; }
+.readme-card h1 { margin:0 0 12px; font-size:28px; }
+.readme-card h2 { margin:22px 0 8px; font-size:21px; }
+.readme-card h3 { margin:18px 0 8px; }
+.readme-card p { margin:0 0 13px; line-height:1.68; color:#374151; }
+.readme-card ul,.readme-card ol { margin:12px 0 14px; padding-left:22px; line-height:1.68; color:#374151; }
+.readme-card li { margin:8px 0; }
+.readme-card code { background:#eef6ff; color:#075985; padding:3px 6px; border-radius:6px; font-weight:700; }
+.readme-card strong { color:#111827; }
+.panel { padding:20px; }
+.panel-head { display:flex; align-items:flex-start; justify-content:space-between; gap:16px; margin-bottom:16px; }
+.panel-head h2 { margin:0; font-size:22px; }
+.panel-head p { margin:5px 0 0; color:#6b7280; font-size:14px; }
+.stats { display:grid; grid-template-columns:repeat(3, minmax(0,1fr)); gap:10px; margin-bottom:16px; }
+.stat { background:#f8fafc; border:1px solid #e5e7eb; border-radius:14px; padding:12px; }
+.stat strong { display:block; font-size:22px; color:#111827; }
+.stat span { font-size:12px; color:#6b7280; }
+.search-wrap { position:relative; margin-bottom:14px; }
+#search { width:100%; padding:12px 14px; border:1px solid #d1d5db; border-radius:12px; outline:none; font-size:15px; background:#fff; }
+#search:focus { border-color:#2563eb; box-shadow:0 0 0 4px rgba(37,99,235,.12); }
+.listing-grid { display:grid; grid-template-columns:1fr; gap:9px; max-height:680px; overflow:auto; padding-right:4px; }
+.entry { display:flex; align-items:center; gap:12px; padding:12px 13px; border:1px solid #e5e7eb; border-radius:14px; background:#fff; color:#111827; transition:.15s ease; }
+.entry:hover { transform:translateY(-1px); box-shadow:0 8px 22px rgba(15,23,42,.08); text-decoration:none; border-color:#bfdbfe; }
+.entry-icon { width:34px; height:34px; display:grid; place-items:center; border-radius:10px; background:#eff6ff; flex:0 0 auto; }
+.entry strong { display:block; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; max-width:100%; }
+.entry small { display:block; margin-top:2px; color:#6b7280; font-weight:500; }
+.empty { padding:18px; text-align:center; color:#6b7280; border:1px dashed #d1d5db; border-radius:14px; background:#f9fafb; }
+.footer-note { margin-top:18px; color:#6b7280; font-size:12px; text-align:center; }
+@media (max-width:900px) { body { background:#f4f6f8; } .hero { color:#111827; padding-top:20px; } .hero h1 { color:#111827; } .hero p { color:#4b5563; } .badge { color:#1f2937; border-color:#d1d5db; background:#fff; } .layout { grid-template-columns:1fr; } }
+@media (max-width:560px) { .page-shell { width:min(100% - 20px, 1180px); padding-top:18px; } .readme-card,.panel { padding:16px; border-radius:14px; } .stats { grid-template-columns:1fr; } }
 </style>
 </head>
 <body>
-<h1>Directory listing</h1>
-<hr/>
+<main class="page-shell">
+<section class="hero">
+<div class="badge">📦 Repositório Kodi • GitHub Pages</div>
+<h1>Repositório OnePlayHD</h1>
+<p>Arquivos organizados para instalação via Kodi. Use a busca para localizar rapidamente repositórios, plugins, scripts e dependências disponíveis.</p>
+</section>
+<section class="layout">
+<div class="card">
 <!-- README.md (PAGINA INICIAL) -->
-<section class="readme-box">
+<section class="readme-card">
 <h1>Repositório Oficial OnePlayHD !!!</h1>
 <p>Este repositório atua exclusivamente como um agregador de links e não hospeda, transmite ou reproduz qualquer conteúdo de mídia. A responsabilidade pelo conteúdo acessado é exclusiva do respectivo provedor ou fonte original.</p>
 <p>Como instalar o repositório OnePlay para ter acesso aos melhores conteúdos da atualidade!</p>
-<p>&lt;p align=&quot;left&quot;&gt;</p>
-<p>&lt;ul&gt;</p>
-<p>&lt;li&gt;Acesse as configurações do Kodi e vá para &lt;strong&gt;Gerenciador de Arquivos (File Manager)&lt;/strong&gt;.&lt;/li&gt;</p>
-<p>&lt;li&gt;Clique em &lt;strong&gt;Adicionar Origem&lt;/strong&gt;.&lt;/li&gt;</p>
-<p>&lt;li&gt;Insira o endereço da fonte: &lt;code&gt;https://oneplayhd.github.io&lt;/code&gt; (Digite um nome para a midia de origem &quot;ONEPLAY&quot;).&lt;/li&gt;</p>
-<p>&lt;li&gt;Confirme e retorne à tela principal. Acesse &lt;strong&gt;Add-ons&lt;/strong&gt;.&lt;/li&gt;</p>
-<p>&lt;li&gt;Em &lt;strong&gt;Add-ons&lt;/strong&gt;, clique no ícone da &lt;strong&gt;caixa de papelão&lt;/strong&gt; e selecione &lt;strong&gt;Instalar a partir de um arquivo ZIP&lt;/strong&gt;. Na lista de dispositivos, selecione &lt;strong&gt;ONEPLAY&lt;/strong&gt; e pressione OK.&lt;/li&gt;</p>
-<p>&lt;li&gt;Após a instalação, retorne a &lt;strong&gt;Add-ons&lt;/strong&gt;, clique novamente na caixa de papelão e selecione &lt;strong&gt;Instalar via repositório&lt;/strong&gt;.&lt;/li&gt;</p>
-<p>&lt;li&gt;Selecione &lt;strong&gt;Repositório: ONEPLAY&lt;/strong&gt;.&lt;/li&gt;</p>
-<p>&lt;/ul&gt;</p>
-<p>&lt;/p&gt;</p>
+<ul>
+<li>Acesse as configurações do Kodi e vá para <strong>Gerenciador de Arquivos (File Manager)</strong>.</li>
+<li>Clique em <strong>Adicionar Origem</strong>.</li>
+<li>Insira o endereço da fonte: <code>https://oneplayhd.github.io</code> (Digite um nome para a midia de origem "ONEPLAY").</li>
+<li>Confirme e retorne à tela principal. Acesse <strong>Add-ons</strong>.</li>
+<li>Em <strong>Add-ons</strong>, clique no ícone da <strong>caixa de papelão</strong> e selecione <strong>Instalar a partir de um arquivo ZIP</strong>. Na lista de dispositivos, selecione <strong>ONEPLAY</strong> e pressione OK.</li>
+<li>Após a instalação, retorne a <strong>Add-ons</strong>, clique novamente na caixa de papelão e selecione <strong>Instalar via repositório</strong>.</li>
+<li>Selecione <strong>Repositório: ONEPLAY</strong>.</li>
+</ul>
 <p><strong> Pronto! Tudo certo — agora é só aproveitar com responsabilidade!! </strong></p>
 <h2>Use, Abuse e Reuse — com consciência e dentro da lei!</h2>
 </section>
-<hr/>
-<input type="text" id="search" placeholder="Pesquisar arquivos ou pastas...">
-<pre id='listing'>
-📁 <a href="./addon.dns/index.html">addon.dns/</a>
-📁 <a href="./context.themoviedb.helper/index.html">context.themoviedb.helper/</a>
-📁 <a href="./hunter.fm/index.html">hunter.fm/</a>
-📁 <a href="./One.repo/index.html">One.repo/</a>
-📁 <a href="./plugin.program.kuswizard/index.html">plugin.program.kuswizard/</a>
-📁 <a href="./plugin.program.oneplaywizard/index.html">plugin.program.oneplaywizard/</a>
-📁 <a href="./plugin.program.openwizard/index.html">plugin.program.openwizard/</a>
-📁 <a href="./plugin.video.animesplay/index.html">plugin.video.animesplay/</a>
-📁 <a href="./plugin.video.animesplay.matrix/index.html">plugin.video.animesplay.matrix/</a>
-📁 <a href="./plugin.video.doramasplus/index.html">plugin.video.doramasplus/</a>
-📁 <a href="./plugin.video.f4mTester/index.html">plugin.video.f4mTester/</a>
-📁 <a href="./plugin.video.iFLix/index.html">plugin.video.iFLix/</a>
-📁 <a href="./plugin.video.iptvorg/index.html">plugin.video.iptvorg/</a>
-📁 <a href="./plugin.video.iptvpremium.matrix/index.html">plugin.video.iptvpremium.matrix/</a>
-📁 <a href="./plugin.video.iptvxc/index.html">plugin.video.iptvxc/</a>
-📁 <a href="./plugin.video.kingiptv/index.html">plugin.video.kingiptv/</a>
-📁 <a href="./plugin.video.meufutebol/index.html">plugin.video.meufutebol/</a>
-📁 <a href="./plugin.video.OnePlay.Matrix/index.html">plugin.video.OnePlay.Matrix/</a>
-📁 <a href="./plugin.video.oneplayvip/index.html">plugin.video.oneplayvip/</a>
-📁 <a href="./plugin.video.onevip/index.html">plugin.video.onevip/</a>
-📁 <a href="./plugin.video.OneX.Matrix/index.html">plugin.video.OneX.Matrix/</a>
-📁 <a href="./plugin.video.picante/index.html">plugin.video.picante/</a>
-📁 <a href="./plugin.video.PlayCine.Matrix/index.html">plugin.video.PlayCine.Matrix/</a>
-📁 <a href="./plugin.video.resolvedor/index.html">plugin.video.resolvedor/</a>
-📁 <a href="./plugin.video.rumble/index.html">plugin.video.rumble/</a>
-📁 <a href="./plugin.video.showdebola/index.html">plugin.video.showdebola/</a>
-📁 <a href="./plugin.video.simplem3u8/index.html">plugin.video.simplem3u8/</a>
-📁 <a href="./plugin.video.simpletvbr/index.html">plugin.video.simpletvbr/</a>
-📁 <a href="./plugin.video.spartanaddon/index.html">plugin.video.spartanaddon/</a>
-📁 <a href="./plugin.video.themoviedb.helper/index.html">plugin.video.themoviedb.helper/</a>
-📁 <a href="./plugin.video.thethunder/index.html">plugin.video.thethunder/</a>
-📁 <a href="./plugin.video.tubemusic/index.html">plugin.video.tubemusic/</a>
-📁 <a href="./plugin.video.xtreamtotal/index.html">plugin.video.xtreamtotal/</a>
-📁 <a href="./plugin.video.youtube/index.html">plugin.video.youtube/</a>
-📁 <a href="./plugin.video.youtubek/index.html">plugin.video.youtubek/</a>
-📁 <a href="./plugin.video.yt.kiosk/index.html">plugin.video.yt.kiosk/</a>
-📁 <a href="./plugin.video.yt.premium/index.html">plugin.video.yt.premium/</a>
-📁 <a href="./repository.elementumorg/index.html">repository.elementumorg/</a>
-📁 <a href="./repository.mirror.mit_omega/index.html">repository.mirror.mit_omega/</a>
-📁 <a href="./repository.slyguy/index.html">repository.slyguy/</a>
-📁 <a href="./resource.font.robotocjksc/index.html">resource.font.robotocjksc/</a>
-📁 <a href="./script.encrypttool/index.html">script.encrypttool/</a>
-📁 <a href="./script.encrypttool.lambda/index.html">script.encrypttool.lambda/</a>
-📁 <a href="./script.limpeza.Matrix/index.html">script.limpeza.Matrix/</a>
-📁 <a href="./script.module.aws-solver/index.html">script.module.aws-solver/</a>
-📁 <a href="./script.module.cloudrequest/index.html">script.module.cloudrequest/</a>
-📁 <a href="./script.module.fasthttp/index.html">script.module.fasthttp/</a>
-📁 <a href="./script.module.flask/index.html">script.module.flask/</a>
-📁 <a href="./script.module.infotagger/index.html">script.module.infotagger/</a>
-📁 <a href="./script.module.jsbeautifier/index.html">script.module.jsbeautifier/</a>
-📁 <a href="./script.module.jurialmunkey/index.html">script.module.jurialmunkey/</a>
-📁 <a href="./script.module.kodi-helper/index.html">script.module.kodi-helper/</a>
-📁 <a href="./script.module.kodi-six/index.html">script.module.kodi-six/</a>
-📁 <a href="./script.module.netunblock/index.html">script.module.netunblock/</a>
-📁 <a href="./script.module.resolveurl/index.html">script.module.resolveurl/</a>
-📁 <a href="./script.module.resolveurl.fork/index.html">script.module.resolveurl.fork/</a>
-📁 <a href="./script.module.six/index.html">script.module.six/</a>
-📁 <a href="./script.module.soupsieve/index.html">script.module.soupsieve/</a>
-📁 <a href="./script.module.tmdbhelper/index.html">script.module.tmdbhelper/</a>
-📁 <a href="./script.oneplayvip.downloader/index.html">script.oneplayvip.downloader/</a>
-📁 <a href="./script.skinvariables/index.html">script.skinvariables/</a>
-📁 <a href="./script.texturemaker/index.html">script.texturemaker/</a>
-📁 <a href="./script.video.F4mProxy/index.html">script.video.F4mProxy/</a>
-📁 <a href="./script.wikipedia/index.html">script.wikipedia/</a>
-📁 <a href="./service.oneplaytv/index.html">service.oneplaytv/</a>
-📁 <a href="./service.subtitles.legendei/index.html">service.subtitles.legendei/</a>
-📁 <a href="./skin.arctic.horizon.2/index.html">skin.arctic.horizon.2/</a>
-📁 <a href="./vfs.rar/index.html">vfs.rar/</a>
-📁 <a href="./vkkodi.repo/index.html">vkkodi.repo/</a>
-📁 <a href="./xbmc.python/index.html">xbmc.python/</a>
-</pre>
+</div>
+<aside class="card panel">
+<div class="panel-head">
+<div>
+<h2>Arquivos disponíveis</h2>
+<p>Pastas e pacotes ZIP encontrados no repositório.</p>
+</div>
+</div>
+<div class="stats">
+<div class="stat"><strong>70</strong><span>pastas</span></div>
+<div class="stat"><strong>0</strong><span>ZIPs na raiz</span></div>
+<div class="stat"><strong>110</strong><span>ZIPs no total</span></div>
+</div>
+<div class="search-wrap"><input type="text" id="search" placeholder="Pesquisar arquivos ou pastas..."></div>
+<div id="listing" class="listing-grid">
+<a class="entry folder" href="./addon.dns/index.html"><span class="entry-icon">📁</span><span><strong>addon.dns/</strong><small>Pasta com arquivos ZIP</small></span></a>
+<a class="entry folder" href="./context.themoviedb.helper/index.html"><span class="entry-icon">📁</span><span><strong>context.themoviedb.helper/</strong><small>Pasta com arquivos ZIP</small></span></a>
+<a class="entry folder" href="./hunter.fm/index.html"><span class="entry-icon">📁</span><span><strong>hunter.fm/</strong><small>Pasta com arquivos ZIP</small></span></a>
+<a class="entry folder" href="./One.repo/index.html"><span class="entry-icon">📁</span><span><strong>One.repo/</strong><small>Pasta com arquivos ZIP</small></span></a>
+<a class="entry folder" href="./plugin.program.kuswizard/index.html"><span class="entry-icon">📁</span><span><strong>plugin.program.kuswizard/</strong><small>Pasta com arquivos ZIP</small></span></a>
+<a class="entry folder" href="./plugin.program.oneplaywizard/index.html"><span class="entry-icon">📁</span><span><strong>plugin.program.oneplaywizard/</strong><small>Pasta com arquivos ZIP</small></span></a>
+<a class="entry folder" href="./plugin.program.openwizard/index.html"><span class="entry-icon">📁</span><span><strong>plugin.program.openwizard/</strong><small>Pasta com arquivos ZIP</small></span></a>
+<a class="entry folder" href="./plugin.video.animesplay/index.html"><span class="entry-icon">📁</span><span><strong>plugin.video.animesplay/</strong><small>Pasta com arquivos ZIP</small></span></a>
+<a class="entry folder" href="./plugin.video.animesplay.matrix/index.html"><span class="entry-icon">📁</span><span><strong>plugin.video.animesplay.matrix/</strong><small>Pasta com arquivos ZIP</small></span></a>
+<a class="entry folder" href="./plugin.video.doramasplus/index.html"><span class="entry-icon">📁</span><span><strong>plugin.video.doramasplus/</strong><small>Pasta com arquivos ZIP</small></span></a>
+<a class="entry folder" href="./plugin.video.f4mTester/index.html"><span class="entry-icon">📁</span><span><strong>plugin.video.f4mTester/</strong><small>Pasta com arquivos ZIP</small></span></a>
+<a class="entry folder" href="./plugin.video.iFLix/index.html"><span class="entry-icon">📁</span><span><strong>plugin.video.iFLix/</strong><small>Pasta com arquivos ZIP</small></span></a>
+<a class="entry folder" href="./plugin.video.iptvorg/index.html"><span class="entry-icon">📁</span><span><strong>plugin.video.iptvorg/</strong><small>Pasta com arquivos ZIP</small></span></a>
+<a class="entry folder" href="./plugin.video.iptvpremium.matrix/index.html"><span class="entry-icon">📁</span><span><strong>plugin.video.iptvpremium.matrix/</strong><small>Pasta com arquivos ZIP</small></span></a>
+<a class="entry folder" href="./plugin.video.iptvxc/index.html"><span class="entry-icon">📁</span><span><strong>plugin.video.iptvxc/</strong><small>Pasta com arquivos ZIP</small></span></a>
+<a class="entry folder" href="./plugin.video.kingiptv/index.html"><span class="entry-icon">📁</span><span><strong>plugin.video.kingiptv/</strong><small>Pasta com arquivos ZIP</small></span></a>
+<a class="entry folder" href="./plugin.video.meufutebol/index.html"><span class="entry-icon">📁</span><span><strong>plugin.video.meufutebol/</strong><small>Pasta com arquivos ZIP</small></span></a>
+<a class="entry folder" href="./plugin.video.OnePlay.Matrix/index.html"><span class="entry-icon">📁</span><span><strong>plugin.video.OnePlay.Matrix/</strong><small>Pasta com arquivos ZIP</small></span></a>
+<a class="entry folder" href="./plugin.video.oneplayvip/index.html"><span class="entry-icon">📁</span><span><strong>plugin.video.oneplayvip/</strong><small>Pasta com arquivos ZIP</small></span></a>
+<a class="entry folder" href="./plugin.video.onevip/index.html"><span class="entry-icon">📁</span><span><strong>plugin.video.onevip/</strong><small>Pasta com arquivos ZIP</small></span></a>
+<a class="entry folder" href="./plugin.video.OneX.Matrix/index.html"><span class="entry-icon">📁</span><span><strong>plugin.video.OneX.Matrix/</strong><small>Pasta com arquivos ZIP</small></span></a>
+<a class="entry folder" href="./plugin.video.picante/index.html"><span class="entry-icon">📁</span><span><strong>plugin.video.picante/</strong><small>Pasta com arquivos ZIP</small></span></a>
+<a class="entry folder" href="./plugin.video.PlayCine.Matrix/index.html"><span class="entry-icon">📁</span><span><strong>plugin.video.PlayCine.Matrix/</strong><small>Pasta com arquivos ZIP</small></span></a>
+<a class="entry folder" href="./plugin.video.resolvedor/index.html"><span class="entry-icon">📁</span><span><strong>plugin.video.resolvedor/</strong><small>Pasta com arquivos ZIP</small></span></a>
+<a class="entry folder" href="./plugin.video.rumble/index.html"><span class="entry-icon">📁</span><span><strong>plugin.video.rumble/</strong><small>Pasta com arquivos ZIP</small></span></a>
+<a class="entry folder" href="./plugin.video.showdebola/index.html"><span class="entry-icon">📁</span><span><strong>plugin.video.showdebola/</strong><small>Pasta com arquivos ZIP</small></span></a>
+<a class="entry folder" href="./plugin.video.simplem3u8/index.html"><span class="entry-icon">📁</span><span><strong>plugin.video.simplem3u8/</strong><small>Pasta com arquivos ZIP</small></span></a>
+<a class="entry folder" href="./plugin.video.simpletvbr/index.html"><span class="entry-icon">📁</span><span><strong>plugin.video.simpletvbr/</strong><small>Pasta com arquivos ZIP</small></span></a>
+<a class="entry folder" href="./plugin.video.spartanaddon/index.html"><span class="entry-icon">📁</span><span><strong>plugin.video.spartanaddon/</strong><small>Pasta com arquivos ZIP</small></span></a>
+<a class="entry folder" href="./plugin.video.themoviedb.helper/index.html"><span class="entry-icon">📁</span><span><strong>plugin.video.themoviedb.helper/</strong><small>Pasta com arquivos ZIP</small></span></a>
+<a class="entry folder" href="./plugin.video.thethunder/index.html"><span class="entry-icon">📁</span><span><strong>plugin.video.thethunder/</strong><small>Pasta com arquivos ZIP</small></span></a>
+<a class="entry folder" href="./plugin.video.tubemusic/index.html"><span class="entry-icon">📁</span><span><strong>plugin.video.tubemusic/</strong><small>Pasta com arquivos ZIP</small></span></a>
+<a class="entry folder" href="./plugin.video.xtreamtotal/index.html"><span class="entry-icon">📁</span><span><strong>plugin.video.xtreamtotal/</strong><small>Pasta com arquivos ZIP</small></span></a>
+<a class="entry folder" href="./plugin.video.youtube/index.html"><span class="entry-icon">📁</span><span><strong>plugin.video.youtube/</strong><small>Pasta com arquivos ZIP</small></span></a>
+<a class="entry folder" href="./plugin.video.youtubek/index.html"><span class="entry-icon">📁</span><span><strong>plugin.video.youtubek/</strong><small>Pasta com arquivos ZIP</small></span></a>
+<a class="entry folder" href="./plugin.video.yt.kiosk/index.html"><span class="entry-icon">📁</span><span><strong>plugin.video.yt.kiosk/</strong><small>Pasta com arquivos ZIP</small></span></a>
+<a class="entry folder" href="./plugin.video.yt.premium/index.html"><span class="entry-icon">📁</span><span><strong>plugin.video.yt.premium/</strong><small>Pasta com arquivos ZIP</small></span></a>
+<a class="entry folder" href="./repository.elementumorg/index.html"><span class="entry-icon">📁</span><span><strong>repository.elementumorg/</strong><small>Pasta com arquivos ZIP</small></span></a>
+<a class="entry folder" href="./repository.mirror.mit_omega/index.html"><span class="entry-icon">📁</span><span><strong>repository.mirror.mit_omega/</strong><small>Pasta com arquivos ZIP</small></span></a>
+<a class="entry folder" href="./repository.slyguy/index.html"><span class="entry-icon">📁</span><span><strong>repository.slyguy/</strong><small>Pasta com arquivos ZIP</small></span></a>
+<a class="entry folder" href="./resource.font.robotocjksc/index.html"><span class="entry-icon">📁</span><span><strong>resource.font.robotocjksc/</strong><small>Pasta com arquivos ZIP</small></span></a>
+<a class="entry folder" href="./script.encrypttool/index.html"><span class="entry-icon">📁</span><span><strong>script.encrypttool/</strong><small>Pasta com arquivos ZIP</small></span></a>
+<a class="entry folder" href="./script.encrypttool.lambda/index.html"><span class="entry-icon">📁</span><span><strong>script.encrypttool.lambda/</strong><small>Pasta com arquivos ZIP</small></span></a>
+<a class="entry folder" href="./script.limpeza.Matrix/index.html"><span class="entry-icon">📁</span><span><strong>script.limpeza.Matrix/</strong><small>Pasta com arquivos ZIP</small></span></a>
+<a class="entry folder" href="./script.module.aws-solver/index.html"><span class="entry-icon">📁</span><span><strong>script.module.aws-solver/</strong><small>Pasta com arquivos ZIP</small></span></a>
+<a class="entry folder" href="./script.module.cloudrequest/index.html"><span class="entry-icon">📁</span><span><strong>script.module.cloudrequest/</strong><small>Pasta com arquivos ZIP</small></span></a>
+<a class="entry folder" href="./script.module.fasthttp/index.html"><span class="entry-icon">📁</span><span><strong>script.module.fasthttp/</strong><small>Pasta com arquivos ZIP</small></span></a>
+<a class="entry folder" href="./script.module.flask/index.html"><span class="entry-icon">📁</span><span><strong>script.module.flask/</strong><small>Pasta com arquivos ZIP</small></span></a>
+<a class="entry folder" href="./script.module.infotagger/index.html"><span class="entry-icon">📁</span><span><strong>script.module.infotagger/</strong><small>Pasta com arquivos ZIP</small></span></a>
+<a class="entry folder" href="./script.module.jsbeautifier/index.html"><span class="entry-icon">📁</span><span><strong>script.module.jsbeautifier/</strong><small>Pasta com arquivos ZIP</small></span></a>
+<a class="entry folder" href="./script.module.jurialmunkey/index.html"><span class="entry-icon">📁</span><span><strong>script.module.jurialmunkey/</strong><small>Pasta com arquivos ZIP</small></span></a>
+<a class="entry folder" href="./script.module.kodi-helper/index.html"><span class="entry-icon">📁</span><span><strong>script.module.kodi-helper/</strong><small>Pasta com arquivos ZIP</small></span></a>
+<a class="entry folder" href="./script.module.kodi-six/index.html"><span class="entry-icon">📁</span><span><strong>script.module.kodi-six/</strong><small>Pasta com arquivos ZIP</small></span></a>
+<a class="entry folder" href="./script.module.netunblock/index.html"><span class="entry-icon">📁</span><span><strong>script.module.netunblock/</strong><small>Pasta com arquivos ZIP</small></span></a>
+<a class="entry folder" href="./script.module.resolveurl/index.html"><span class="entry-icon">📁</span><span><strong>script.module.resolveurl/</strong><small>Pasta com arquivos ZIP</small></span></a>
+<a class="entry folder" href="./script.module.resolveurl.fork/index.html"><span class="entry-icon">📁</span><span><strong>script.module.resolveurl.fork/</strong><small>Pasta com arquivos ZIP</small></span></a>
+<a class="entry folder" href="./script.module.six/index.html"><span class="entry-icon">📁</span><span><strong>script.module.six/</strong><small>Pasta com arquivos ZIP</small></span></a>
+<a class="entry folder" href="./script.module.soupsieve/index.html"><span class="entry-icon">📁</span><span><strong>script.module.soupsieve/</strong><small>Pasta com arquivos ZIP</small></span></a>
+<a class="entry folder" href="./script.module.tmdbhelper/index.html"><span class="entry-icon">📁</span><span><strong>script.module.tmdbhelper/</strong><small>Pasta com arquivos ZIP</small></span></a>
+<a class="entry folder" href="./script.oneplayvip.downloader/index.html"><span class="entry-icon">📁</span><span><strong>script.oneplayvip.downloader/</strong><small>Pasta com arquivos ZIP</small></span></a>
+<a class="entry folder" href="./script.skinvariables/index.html"><span class="entry-icon">📁</span><span><strong>script.skinvariables/</strong><small>Pasta com arquivos ZIP</small></span></a>
+<a class="entry folder" href="./script.texturemaker/index.html"><span class="entry-icon">📁</span><span><strong>script.texturemaker/</strong><small>Pasta com arquivos ZIP</small></span></a>
+<a class="entry folder" href="./script.video.F4mProxy/index.html"><span class="entry-icon">📁</span><span><strong>script.video.F4mProxy/</strong><small>Pasta com arquivos ZIP</small></span></a>
+<a class="entry folder" href="./script.wikipedia/index.html"><span class="entry-icon">📁</span><span><strong>script.wikipedia/</strong><small>Pasta com arquivos ZIP</small></span></a>
+<a class="entry folder" href="./service.oneplaytv/index.html"><span class="entry-icon">📁</span><span><strong>service.oneplaytv/</strong><small>Pasta com arquivos ZIP</small></span></a>
+<a class="entry folder" href="./service.subtitles.legendei/index.html"><span class="entry-icon">📁</span><span><strong>service.subtitles.legendei/</strong><small>Pasta com arquivos ZIP</small></span></a>
+<a class="entry folder" href="./skin.arctic.horizon.2/index.html"><span class="entry-icon">📁</span><span><strong>skin.arctic.horizon.2/</strong><small>Pasta com arquivos ZIP</small></span></a>
+<a class="entry folder" href="./vfs.rar/index.html"><span class="entry-icon">📁</span><span><strong>vfs.rar/</strong><small>Pasta com arquivos ZIP</small></span></a>
+<a class="entry folder" href="./vkkodi.repo/index.html"><span class="entry-icon">📁</span><span><strong>vkkodi.repo/</strong><small>Pasta com arquivos ZIP</small></span></a>
+<a class="entry folder" href="./xbmc.python/index.html"><span class="entry-icon">📁</span><span><strong>xbmc.python/</strong><small>Pasta com arquivos ZIP</small></span></a>
+</div>
+<div class="footer-note">Página gerada automaticamente pelo GitHub Actions.</div>
+</aside>
+</section>
+</main>
 <script>
-const items = [["addon.dns", "📁 <a href=\"./addon.dns/index.html\">addon.dns/</a>"], ["context.themoviedb.helper", "📁 <a href=\"./context.themoviedb.helper/index.html\">context.themoviedb.helper/</a>"], ["hunter.fm", "📁 <a href=\"./hunter.fm/index.html\">hunter.fm/</a>"], ["one.repo", "📁 <a href=\"./One.repo/index.html\">One.repo/</a>"], ["plugin.program.kuswizard", "📁 <a href=\"./plugin.program.kuswizard/index.html\">plugin.program.kuswizard/</a>"], ["plugin.program.oneplaywizard", "📁 <a href=\"./plugin.program.oneplaywizard/index.html\">plugin.program.oneplaywizard/</a>"], ["plugin.program.openwizard", "📁 <a href=\"./plugin.program.openwizard/index.html\">plugin.program.openwizard/</a>"], ["plugin.video.animesplay", "📁 <a href=\"./plugin.video.animesplay/index.html\">plugin.video.animesplay/</a>"], ["plugin.video.animesplay.matrix", "📁 <a href=\"./plugin.video.animesplay.matrix/index.html\">plugin.video.animesplay.matrix/</a>"], ["plugin.video.doramasplus", "📁 <a href=\"./plugin.video.doramasplus/index.html\">plugin.video.doramasplus/</a>"], ["plugin.video.f4mtester", "📁 <a href=\"./plugin.video.f4mTester/index.html\">plugin.video.f4mTester/</a>"], ["plugin.video.iflix", "📁 <a href=\"./plugin.video.iFLix/index.html\">plugin.video.iFLix/</a>"], ["plugin.video.iptvorg", "📁 <a href=\"./plugin.video.iptvorg/index.html\">plugin.video.iptvorg/</a>"], ["plugin.video.iptvpremium.matrix", "📁 <a href=\"./plugin.video.iptvpremium.matrix/index.html\">plugin.video.iptvpremium.matrix/</a>"], ["plugin.video.iptvxc", "📁 <a href=\"./plugin.video.iptvxc/index.html\">plugin.video.iptvxc/</a>"], ["plugin.video.kingiptv", "📁 <a href=\"./plugin.video.kingiptv/index.html\">plugin.video.kingiptv/</a>"], ["plugin.video.meufutebol", "📁 <a href=\"./plugin.video.meufutebol/index.html\">plugin.video.meufutebol/</a>"], ["plugin.video.oneplay.matrix", "📁 <a href=\"./plugin.video.OnePlay.Matrix/index.html\">plugin.video.OnePlay.Matrix/</a>"], ["plugin.video.oneplayvip", "📁 <a href=\"./plugin.video.oneplayvip/index.html\">plugin.video.oneplayvip/</a>"], ["plugin.video.onevip", "📁 <a href=\"./plugin.video.onevip/index.html\">plugin.video.onevip/</a>"], ["plugin.video.onex.matrix", "📁 <a href=\"./plugin.video.OneX.Matrix/index.html\">plugin.video.OneX.Matrix/</a>"], ["plugin.video.picante", "📁 <a href=\"./plugin.video.picante/index.html\">plugin.video.picante/</a>"], ["plugin.video.playcine.matrix", "📁 <a href=\"./plugin.video.PlayCine.Matrix/index.html\">plugin.video.PlayCine.Matrix/</a>"], ["plugin.video.resolvedor", "📁 <a href=\"./plugin.video.resolvedor/index.html\">plugin.video.resolvedor/</a>"], ["plugin.video.rumble", "📁 <a href=\"./plugin.video.rumble/index.html\">plugin.video.rumble/</a>"], ["plugin.video.showdebola", "📁 <a href=\"./plugin.video.showdebola/index.html\">plugin.video.showdebola/</a>"], ["plugin.video.simplem3u8", "📁 <a href=\"./plugin.video.simplem3u8/index.html\">plugin.video.simplem3u8/</a>"], ["plugin.video.simpletvbr", "📁 <a href=\"./plugin.video.simpletvbr/index.html\">plugin.video.simpletvbr/</a>"], ["plugin.video.spartanaddon", "📁 <a href=\"./plugin.video.spartanaddon/index.html\">plugin.video.spartanaddon/</a>"], ["plugin.video.themoviedb.helper", "📁 <a href=\"./plugin.video.themoviedb.helper/index.html\">plugin.video.themoviedb.helper/</a>"], ["plugin.video.thethunder", "📁 <a href=\"./plugin.video.thethunder/index.html\">plugin.video.thethunder/</a>"], ["plugin.video.tubemusic", "📁 <a href=\"./plugin.video.tubemusic/index.html\">plugin.video.tubemusic/</a>"], ["plugin.video.xtreamtotal", "📁 <a href=\"./plugin.video.xtreamtotal/index.html\">plugin.video.xtreamtotal/</a>"], ["plugin.video.youtube", "📁 <a href=\"./plugin.video.youtube/index.html\">plugin.video.youtube/</a>"], ["plugin.video.youtubek", "📁 <a href=\"./plugin.video.youtubek/index.html\">plugin.video.youtubek/</a>"], ["plugin.video.yt.kiosk", "📁 <a href=\"./plugin.video.yt.kiosk/index.html\">plugin.video.yt.kiosk/</a>"], ["plugin.video.yt.premium", "📁 <a href=\"./plugin.video.yt.premium/index.html\">plugin.video.yt.premium/</a>"], ["repository.elementumorg", "📁 <a href=\"./repository.elementumorg/index.html\">repository.elementumorg/</a>"], ["repository.mirror.mit_omega", "📁 <a href=\"./repository.mirror.mit_omega/index.html\">repository.mirror.mit_omega/</a>"], ["repository.slyguy", "📁 <a href=\"./repository.slyguy/index.html\">repository.slyguy/</a>"], ["resource.font.robotocjksc", "📁 <a href=\"./resource.font.robotocjksc/index.html\">resource.font.robotocjksc/</a>"], ["script.encrypttool", "📁 <a href=\"./script.encrypttool/index.html\">script.encrypttool/</a>"], ["script.encrypttool.lambda", "📁 <a href=\"./script.encrypttool.lambda/index.html\">script.encrypttool.lambda/</a>"], ["script.limpeza.matrix", "📁 <a href=\"./script.limpeza.Matrix/index.html\">script.limpeza.Matrix/</a>"], ["script.module.aws-solver", "📁 <a href=\"./script.module.aws-solver/index.html\">script.module.aws-solver/</a>"], ["script.module.cloudrequest", "📁 <a href=\"./script.module.cloudrequest/index.html\">script.module.cloudrequest/</a>"], ["script.module.fasthttp", "📁 <a href=\"./script.module.fasthttp/index.html\">script.module.fasthttp/</a>"], ["script.module.flask", "📁 <a href=\"./script.module.flask/index.html\">script.module.flask/</a>"], ["script.module.infotagger", "📁 <a href=\"./script.module.infotagger/index.html\">script.module.infotagger/</a>"], ["script.module.jsbeautifier", "📁 <a href=\"./script.module.jsbeautifier/index.html\">script.module.jsbeautifier/</a>"], ["script.module.jurialmunkey", "📁 <a href=\"./script.module.jurialmunkey/index.html\">script.module.jurialmunkey/</a>"], ["script.module.kodi-helper", "📁 <a href=\"./script.module.kodi-helper/index.html\">script.module.kodi-helper/</a>"], ["script.module.kodi-six", "📁 <a href=\"./script.module.kodi-six/index.html\">script.module.kodi-six/</a>"], ["script.module.netunblock", "📁 <a href=\"./script.module.netunblock/index.html\">script.module.netunblock/</a>"], ["script.module.resolveurl", "📁 <a href=\"./script.module.resolveurl/index.html\">script.module.resolveurl/</a>"], ["script.module.resolveurl.fork", "📁 <a href=\"./script.module.resolveurl.fork/index.html\">script.module.resolveurl.fork/</a>"], ["script.module.six", "📁 <a href=\"./script.module.six/index.html\">script.module.six/</a>"], ["script.module.soupsieve", "📁 <a href=\"./script.module.soupsieve/index.html\">script.module.soupsieve/</a>"], ["script.module.tmdbhelper", "📁 <a href=\"./script.module.tmdbhelper/index.html\">script.module.tmdbhelper/</a>"], ["script.oneplayvip.downloader", "📁 <a href=\"./script.oneplayvip.downloader/index.html\">script.oneplayvip.downloader/</a>"], ["script.skinvariables", "📁 <a href=\"./script.skinvariables/index.html\">script.skinvariables/</a>"], ["script.texturemaker", "📁 <a href=\"./script.texturemaker/index.html\">script.texturemaker/</a>"], ["script.video.f4mproxy", "📁 <a href=\"./script.video.F4mProxy/index.html\">script.video.F4mProxy/</a>"], ["script.wikipedia", "📁 <a href=\"./script.wikipedia/index.html\">script.wikipedia/</a>"], ["service.oneplaytv", "📁 <a href=\"./service.oneplaytv/index.html\">service.oneplaytv/</a>"], ["service.subtitles.legendei", "📁 <a href=\"./service.subtitles.legendei/index.html\">service.subtitles.legendei/</a>"], ["skin.arctic.horizon.2", "📁 <a href=\"./skin.arctic.horizon.2/index.html\">skin.arctic.horizon.2/</a>"], ["vfs.rar", "📁 <a href=\"./vfs.rar/index.html\">vfs.rar/</a>"], ["vkkodi.repo", "📁 <a href=\"./vkkodi.repo/index.html\">vkkodi.repo/</a>"], ["xbmc.python", "📁 <a href=\"./xbmc.python/index.html\">xbmc.python/</a>"]];
+const items = [["addon.dns", "<a class=\"entry folder\" href=\"./addon.dns/index.html\"><span class=\"entry-icon\">📁</span><span><strong>addon.dns/</strong><small>Pasta com arquivos ZIP</small></span></a>"], ["context.themoviedb.helper", "<a class=\"entry folder\" href=\"./context.themoviedb.helper/index.html\"><span class=\"entry-icon\">📁</span><span><strong>context.themoviedb.helper/</strong><small>Pasta com arquivos ZIP</small></span></a>"], ["hunter.fm", "<a class=\"entry folder\" href=\"./hunter.fm/index.html\"><span class=\"entry-icon\">📁</span><span><strong>hunter.fm/</strong><small>Pasta com arquivos ZIP</small></span></a>"], ["one.repo", "<a class=\"entry folder\" href=\"./One.repo/index.html\"><span class=\"entry-icon\">📁</span><span><strong>One.repo/</strong><small>Pasta com arquivos ZIP</small></span></a>"], ["plugin.program.kuswizard", "<a class=\"entry folder\" href=\"./plugin.program.kuswizard/index.html\"><span class=\"entry-icon\">📁</span><span><strong>plugin.program.kuswizard/</strong><small>Pasta com arquivos ZIP</small></span></a>"], ["plugin.program.oneplaywizard", "<a class=\"entry folder\" href=\"./plugin.program.oneplaywizard/index.html\"><span class=\"entry-icon\">📁</span><span><strong>plugin.program.oneplaywizard/</strong><small>Pasta com arquivos ZIP</small></span></a>"], ["plugin.program.openwizard", "<a class=\"entry folder\" href=\"./plugin.program.openwizard/index.html\"><span class=\"entry-icon\">📁</span><span><strong>plugin.program.openwizard/</strong><small>Pasta com arquivos ZIP</small></span></a>"], ["plugin.video.animesplay", "<a class=\"entry folder\" href=\"./plugin.video.animesplay/index.html\"><span class=\"entry-icon\">📁</span><span><strong>plugin.video.animesplay/</strong><small>Pasta com arquivos ZIP</small></span></a>"], ["plugin.video.animesplay.matrix", "<a class=\"entry folder\" href=\"./plugin.video.animesplay.matrix/index.html\"><span class=\"entry-icon\">📁</span><span><strong>plugin.video.animesplay.matrix/</strong><small>Pasta com arquivos ZIP</small></span></a>"], ["plugin.video.doramasplus", "<a class=\"entry folder\" href=\"./plugin.video.doramasplus/index.html\"><span class=\"entry-icon\">📁</span><span><strong>plugin.video.doramasplus/</strong><small>Pasta com arquivos ZIP</small></span></a>"], ["plugin.video.f4mtester", "<a class=\"entry folder\" href=\"./plugin.video.f4mTester/index.html\"><span class=\"entry-icon\">📁</span><span><strong>plugin.video.f4mTester/</strong><small>Pasta com arquivos ZIP</small></span></a>"], ["plugin.video.iflix", "<a class=\"entry folder\" href=\"./plugin.video.iFLix/index.html\"><span class=\"entry-icon\">📁</span><span><strong>plugin.video.iFLix/</strong><small>Pasta com arquivos ZIP</small></span></a>"], ["plugin.video.iptvorg", "<a class=\"entry folder\" href=\"./plugin.video.iptvorg/index.html\"><span class=\"entry-icon\">📁</span><span><strong>plugin.video.iptvorg/</strong><small>Pasta com arquivos ZIP</small></span></a>"], ["plugin.video.iptvpremium.matrix", "<a class=\"entry folder\" href=\"./plugin.video.iptvpremium.matrix/index.html\"><span class=\"entry-icon\">📁</span><span><strong>plugin.video.iptvpremium.matrix/</strong><small>Pasta com arquivos ZIP</small></span></a>"], ["plugin.video.iptvxc", "<a class=\"entry folder\" href=\"./plugin.video.iptvxc/index.html\"><span class=\"entry-icon\">📁</span><span><strong>plugin.video.iptvxc/</strong><small>Pasta com arquivos ZIP</small></span></a>"], ["plugin.video.kingiptv", "<a class=\"entry folder\" href=\"./plugin.video.kingiptv/index.html\"><span class=\"entry-icon\">📁</span><span><strong>plugin.video.kingiptv/</strong><small>Pasta com arquivos ZIP</small></span></a>"], ["plugin.video.meufutebol", "<a class=\"entry folder\" href=\"./plugin.video.meufutebol/index.html\"><span class=\"entry-icon\">📁</span><span><strong>plugin.video.meufutebol/</strong><small>Pasta com arquivos ZIP</small></span></a>"], ["plugin.video.oneplay.matrix", "<a class=\"entry folder\" href=\"./plugin.video.OnePlay.Matrix/index.html\"><span class=\"entry-icon\">📁</span><span><strong>plugin.video.OnePlay.Matrix/</strong><small>Pasta com arquivos ZIP</small></span></a>"], ["plugin.video.oneplayvip", "<a class=\"entry folder\" href=\"./plugin.video.oneplayvip/index.html\"><span class=\"entry-icon\">📁</span><span><strong>plugin.video.oneplayvip/</strong><small>Pasta com arquivos ZIP</small></span></a>"], ["plugin.video.onevip", "<a class=\"entry folder\" href=\"./plugin.video.onevip/index.html\"><span class=\"entry-icon\">📁</span><span><strong>plugin.video.onevip/</strong><small>Pasta com arquivos ZIP</small></span></a>"], ["plugin.video.onex.matrix", "<a class=\"entry folder\" href=\"./plugin.video.OneX.Matrix/index.html\"><span class=\"entry-icon\">📁</span><span><strong>plugin.video.OneX.Matrix/</strong><small>Pasta com arquivos ZIP</small></span></a>"], ["plugin.video.picante", "<a class=\"entry folder\" href=\"./plugin.video.picante/index.html\"><span class=\"entry-icon\">📁</span><span><strong>plugin.video.picante/</strong><small>Pasta com arquivos ZIP</small></span></a>"], ["plugin.video.playcine.matrix", "<a class=\"entry folder\" href=\"./plugin.video.PlayCine.Matrix/index.html\"><span class=\"entry-icon\">📁</span><span><strong>plugin.video.PlayCine.Matrix/</strong><small>Pasta com arquivos ZIP</small></span></a>"], ["plugin.video.resolvedor", "<a class=\"entry folder\" href=\"./plugin.video.resolvedor/index.html\"><span class=\"entry-icon\">📁</span><span><strong>plugin.video.resolvedor/</strong><small>Pasta com arquivos ZIP</small></span></a>"], ["plugin.video.rumble", "<a class=\"entry folder\" href=\"./plugin.video.rumble/index.html\"><span class=\"entry-icon\">📁</span><span><strong>plugin.video.rumble/</strong><small>Pasta com arquivos ZIP</small></span></a>"], ["plugin.video.showdebola", "<a class=\"entry folder\" href=\"./plugin.video.showdebola/index.html\"><span class=\"entry-icon\">📁</span><span><strong>plugin.video.showdebola/</strong><small>Pasta com arquivos ZIP</small></span></a>"], ["plugin.video.simplem3u8", "<a class=\"entry folder\" href=\"./plugin.video.simplem3u8/index.html\"><span class=\"entry-icon\">📁</span><span><strong>plugin.video.simplem3u8/</strong><small>Pasta com arquivos ZIP</small></span></a>"], ["plugin.video.simpletvbr", "<a class=\"entry folder\" href=\"./plugin.video.simpletvbr/index.html\"><span class=\"entry-icon\">📁</span><span><strong>plugin.video.simpletvbr/</strong><small>Pasta com arquivos ZIP</small></span></a>"], ["plugin.video.spartanaddon", "<a class=\"entry folder\" href=\"./plugin.video.spartanaddon/index.html\"><span class=\"entry-icon\">📁</span><span><strong>plugin.video.spartanaddon/</strong><small>Pasta com arquivos ZIP</small></span></a>"], ["plugin.video.themoviedb.helper", "<a class=\"entry folder\" href=\"./plugin.video.themoviedb.helper/index.html\"><span class=\"entry-icon\">📁</span><span><strong>plugin.video.themoviedb.helper/</strong><small>Pasta com arquivos ZIP</small></span></a>"], ["plugin.video.thethunder", "<a class=\"entry folder\" href=\"./plugin.video.thethunder/index.html\"><span class=\"entry-icon\">📁</span><span><strong>plugin.video.thethunder/</strong><small>Pasta com arquivos ZIP</small></span></a>"], ["plugin.video.tubemusic", "<a class=\"entry folder\" href=\"./plugin.video.tubemusic/index.html\"><span class=\"entry-icon\">📁</span><span><strong>plugin.video.tubemusic/</strong><small>Pasta com arquivos ZIP</small></span></a>"], ["plugin.video.xtreamtotal", "<a class=\"entry folder\" href=\"./plugin.video.xtreamtotal/index.html\"><span class=\"entry-icon\">📁</span><span><strong>plugin.video.xtreamtotal/</strong><small>Pasta com arquivos ZIP</small></span></a>"], ["plugin.video.youtube", "<a class=\"entry folder\" href=\"./plugin.video.youtube/index.html\"><span class=\"entry-icon\">📁</span><span><strong>plugin.video.youtube/</strong><small>Pasta com arquivos ZIP</small></span></a>"], ["plugin.video.youtubek", "<a class=\"entry folder\" href=\"./plugin.video.youtubek/index.html\"><span class=\"entry-icon\">📁</span><span><strong>plugin.video.youtubek/</strong><small>Pasta com arquivos ZIP</small></span></a>"], ["plugin.video.yt.kiosk", "<a class=\"entry folder\" href=\"./plugin.video.yt.kiosk/index.html\"><span class=\"entry-icon\">📁</span><span><strong>plugin.video.yt.kiosk/</strong><small>Pasta com arquivos ZIP</small></span></a>"], ["plugin.video.yt.premium", "<a class=\"entry folder\" href=\"./plugin.video.yt.premium/index.html\"><span class=\"entry-icon\">📁</span><span><strong>plugin.video.yt.premium/</strong><small>Pasta com arquivos ZIP</small></span></a>"], ["repository.elementumorg", "<a class=\"entry folder\" href=\"./repository.elementumorg/index.html\"><span class=\"entry-icon\">📁</span><span><strong>repository.elementumorg/</strong><small>Pasta com arquivos ZIP</small></span></a>"], ["repository.mirror.mit_omega", "<a class=\"entry folder\" href=\"./repository.mirror.mit_omega/index.html\"><span class=\"entry-icon\">📁</span><span><strong>repository.mirror.mit_omega/</strong><small>Pasta com arquivos ZIP</small></span></a>"], ["repository.slyguy", "<a class=\"entry folder\" href=\"./repository.slyguy/index.html\"><span class=\"entry-icon\">📁</span><span><strong>repository.slyguy/</strong><small>Pasta com arquivos ZIP</small></span></a>"], ["resource.font.robotocjksc", "<a class=\"entry folder\" href=\"./resource.font.robotocjksc/index.html\"><span class=\"entry-icon\">📁</span><span><strong>resource.font.robotocjksc/</strong><small>Pasta com arquivos ZIP</small></span></a>"], ["script.encrypttool", "<a class=\"entry folder\" href=\"./script.encrypttool/index.html\"><span class=\"entry-icon\">📁</span><span><strong>script.encrypttool/</strong><small>Pasta com arquivos ZIP</small></span></a>"], ["script.encrypttool.lambda", "<a class=\"entry folder\" href=\"./script.encrypttool.lambda/index.html\"><span class=\"entry-icon\">📁</span><span><strong>script.encrypttool.lambda/</strong><small>Pasta com arquivos ZIP</small></span></a>"], ["script.limpeza.matrix", "<a class=\"entry folder\" href=\"./script.limpeza.Matrix/index.html\"><span class=\"entry-icon\">📁</span><span><strong>script.limpeza.Matrix/</strong><small>Pasta com arquivos ZIP</small></span></a>"], ["script.module.aws-solver", "<a class=\"entry folder\" href=\"./script.module.aws-solver/index.html\"><span class=\"entry-icon\">📁</span><span><strong>script.module.aws-solver/</strong><small>Pasta com arquivos ZIP</small></span></a>"], ["script.module.cloudrequest", "<a class=\"entry folder\" href=\"./script.module.cloudrequest/index.html\"><span class=\"entry-icon\">📁</span><span><strong>script.module.cloudrequest/</strong><small>Pasta com arquivos ZIP</small></span></a>"], ["script.module.fasthttp", "<a class=\"entry folder\" href=\"./script.module.fasthttp/index.html\"><span class=\"entry-icon\">📁</span><span><strong>script.module.fasthttp/</strong><small>Pasta com arquivos ZIP</small></span></a>"], ["script.module.flask", "<a class=\"entry folder\" href=\"./script.module.flask/index.html\"><span class=\"entry-icon\">📁</span><span><strong>script.module.flask/</strong><small>Pasta com arquivos ZIP</small></span></a>"], ["script.module.infotagger", "<a class=\"entry folder\" href=\"./script.module.infotagger/index.html\"><span class=\"entry-icon\">📁</span><span><strong>script.module.infotagger/</strong><small>Pasta com arquivos ZIP</small></span></a>"], ["script.module.jsbeautifier", "<a class=\"entry folder\" href=\"./script.module.jsbeautifier/index.html\"><span class=\"entry-icon\">📁</span><span><strong>script.module.jsbeautifier/</strong><small>Pasta com arquivos ZIP</small></span></a>"], ["script.module.jurialmunkey", "<a class=\"entry folder\" href=\"./script.module.jurialmunkey/index.html\"><span class=\"entry-icon\">📁</span><span><strong>script.module.jurialmunkey/</strong><small>Pasta com arquivos ZIP</small></span></a>"], ["script.module.kodi-helper", "<a class=\"entry folder\" href=\"./script.module.kodi-helper/index.html\"><span class=\"entry-icon\">📁</span><span><strong>script.module.kodi-helper/</strong><small>Pasta com arquivos ZIP</small></span></a>"], ["script.module.kodi-six", "<a class=\"entry folder\" href=\"./script.module.kodi-six/index.html\"><span class=\"entry-icon\">📁</span><span><strong>script.module.kodi-six/</strong><small>Pasta com arquivos ZIP</small></span></a>"], ["script.module.netunblock", "<a class=\"entry folder\" href=\"./script.module.netunblock/index.html\"><span class=\"entry-icon\">📁</span><span><strong>script.module.netunblock/</strong><small>Pasta com arquivos ZIP</small></span></a>"], ["script.module.resolveurl", "<a class=\"entry folder\" href=\"./script.module.resolveurl/index.html\"><span class=\"entry-icon\">📁</span><span><strong>script.module.resolveurl/</strong><small>Pasta com arquivos ZIP</small></span></a>"], ["script.module.resolveurl.fork", "<a class=\"entry folder\" href=\"./script.module.resolveurl.fork/index.html\"><span class=\"entry-icon\">📁</span><span><strong>script.module.resolveurl.fork/</strong><small>Pasta com arquivos ZIP</small></span></a>"], ["script.module.six", "<a class=\"entry folder\" href=\"./script.module.six/index.html\"><span class=\"entry-icon\">📁</span><span><strong>script.module.six/</strong><small>Pasta com arquivos ZIP</small></span></a>"], ["script.module.soupsieve", "<a class=\"entry folder\" href=\"./script.module.soupsieve/index.html\"><span class=\"entry-icon\">📁</span><span><strong>script.module.soupsieve/</strong><small>Pasta com arquivos ZIP</small></span></a>"], ["script.module.tmdbhelper", "<a class=\"entry folder\" href=\"./script.module.tmdbhelper/index.html\"><span class=\"entry-icon\">📁</span><span><strong>script.module.tmdbhelper/</strong><small>Pasta com arquivos ZIP</small></span></a>"], ["script.oneplayvip.downloader", "<a class=\"entry folder\" href=\"./script.oneplayvip.downloader/index.html\"><span class=\"entry-icon\">📁</span><span><strong>script.oneplayvip.downloader/</strong><small>Pasta com arquivos ZIP</small></span></a>"], ["script.skinvariables", "<a class=\"entry folder\" href=\"./script.skinvariables/index.html\"><span class=\"entry-icon\">📁</span><span><strong>script.skinvariables/</strong><small>Pasta com arquivos ZIP</small></span></a>"], ["script.texturemaker", "<a class=\"entry folder\" href=\"./script.texturemaker/index.html\"><span class=\"entry-icon\">📁</span><span><strong>script.texturemaker/</strong><small>Pasta com arquivos ZIP</small></span></a>"], ["script.video.f4mproxy", "<a class=\"entry folder\" href=\"./script.video.F4mProxy/index.html\"><span class=\"entry-icon\">📁</span><span><strong>script.video.F4mProxy/</strong><small>Pasta com arquivos ZIP</small></span></a>"], ["script.wikipedia", "<a class=\"entry folder\" href=\"./script.wikipedia/index.html\"><span class=\"entry-icon\">📁</span><span><strong>script.wikipedia/</strong><small>Pasta com arquivos ZIP</small></span></a>"], ["service.oneplaytv", "<a class=\"entry folder\" href=\"./service.oneplaytv/index.html\"><span class=\"entry-icon\">📁</span><span><strong>service.oneplaytv/</strong><small>Pasta com arquivos ZIP</small></span></a>"], ["service.subtitles.legendei", "<a class=\"entry folder\" href=\"./service.subtitles.legendei/index.html\"><span class=\"entry-icon\">📁</span><span><strong>service.subtitles.legendei/</strong><small>Pasta com arquivos ZIP</small></span></a>"], ["skin.arctic.horizon.2", "<a class=\"entry folder\" href=\"./skin.arctic.horizon.2/index.html\"><span class=\"entry-icon\">📁</span><span><strong>skin.arctic.horizon.2/</strong><small>Pasta com arquivos ZIP</small></span></a>"], ["vfs.rar", "<a class=\"entry folder\" href=\"./vfs.rar/index.html\"><span class=\"entry-icon\">📁</span><span><strong>vfs.rar/</strong><small>Pasta com arquivos ZIP</small></span></a>"], ["vkkodi.repo", "<a class=\"entry folder\" href=\"./vkkodi.repo/index.html\"><span class=\"entry-icon\">📁</span><span><strong>vkkodi.repo/</strong><small>Pasta com arquivos ZIP</small></span></a>"], ["xbmc.python", "<a class=\"entry folder\" href=\"./xbmc.python/index.html\"><span class=\"entry-icon\">📁</span><span><strong>xbmc.python/</strong><small>Pasta com arquivos ZIP</small></span></a>"]];
 const input = document.getElementById('search');
 const listing = document.getElementById('listing');
+const empty = '<div class="empty">Nenhum resultado encontrado.</div>';
 input.addEventListener('input', () => {
   const t = input.value.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
-  listing.innerHTML = items.filter(i => i[0].includes(t)).map(i => i[1]).join('\n');
+  const result = items.filter(i => i[0].includes(t)).map(i => i[1]).join('');
+  listing.innerHTML = result || empty;
 });
 </script>
 </body>
