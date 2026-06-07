@@ -403,11 +403,6 @@ def gerar_index_raiz(raiz: Path, pastas_com_zip: set[Path], todos_zips: list[Pat
         "</head>",
         "<body>",
         '<main class="page-shell">',
-        '<section class="hero">',
-        '<div class="badge">📦 Repositório Kodi • GitHub Pages</div>',
-        "<h1>Repositório OnePlayHD</h1>",
-        "<p>Arquivos organizados para instalação via Kodi. Use a busca para localizar rapidamente repositórios, plugins, scripts e dependências disponíveis.</p>",
-        "</section>",
         '<section class="layout">',
         '<div class="card">',
     ]
