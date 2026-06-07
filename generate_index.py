@@ -1,12 +1,14 @@
 from pathlib import Path
+from html.parser import HTMLParser
 import html
 import json
 import re
 import unicodedata
-from urllib.parse import quote
+from urllib.parse import quote, urlparse
 
 REPO_ZIP_RE = re.compile(r"One\.repo-(\d+(?:\.\d+)*)\.zip$", re.IGNORECASE)
 README_NAME = "README.md"
+KODI_BLOCK_COMMENT = "<!-- REPOSITORIO KODI (FORA DO HTML) -->"
 
 
 # Utils
@@ -44,30 +46,112 @@ def caminho_publicavel(path: Path, raiz: Path) -> bool:
     return not any(parte.startswith(".") for parte in partes)
 
 
+def pasta_tem_zip(pasta: Path, pastas_com_zip: set[Path]) -> bool:
+    return any(caminho_relativo(pasta_zip, pasta) for pasta_zip in pastas_com_zip)
+
+
+def href_nome(nome: str) -> str:
+    """Escapa nomes de arquivo/pasta para uso seguro em href local."""
+    return quote(nome, safe="")
+
+
+def href_relativo(path: Path, raiz: Path) -> str:
+    return quote(path.relative_to(raiz).as_posix(), safe="/")
+
+
 # README.md da raiz exibido somente na página inicial.
-def markdown_inline(texto: str) -> str:
-    """Renderização simples e segura para links Markdown em linha."""
-    marcador = "\u0000MDLINK{}\u0000"
-    links = []
+def url_segura(url: str) -> bool:
+    """Permite links relativos, âncoras e URLs http/https/mailto/tel."""
+    url = url.strip()
+    if not url:
+        return False
+    parsed = urlparse(url)
+    if parsed.scheme and parsed.scheme.lower() not in {"http", "https", "mailto", "tel"}:
+        return False
+    lowered = url.lower().replace("\x00", "")
+    return not lowered.startswith(("javascript:", "data:", "vbscript:"))
 
+
+class SanitizadorHTML(HTMLParser):
+    """
+    Sanitizador simples e conservador para permitir HTML básico no README.md.
+    Evita script/style/atributos perigosos, mas preserva ul/li/strong/code usados no README.
+    """
+    TAGS_BLOCO = {"p", "ul", "ol", "li", "blockquote", "pre", "h1", "h2", "h3", "h4", "h5", "h6", "br"}
+    TAGS_INLINE = {"strong", "b", "em", "i", "code", "a", "span"}
+    TAGS_PERMITIDAS = TAGS_BLOCO | TAGS_INLINE
+    TAGS_DESCARTAR_CONTEUDO = {"script", "style", "iframe", "object", "embed"}
+
+    def __init__(self):
+        super().__init__(convert_charrefs=True)
+        self.partes = []
+        self.descartar_ate = None
+
+    def handle_starttag(self, tag, attrs):
+        tag = tag.lower()
+        if tag in self.TAGS_DESCARTAR_CONTEUDO:
+            self.descartar_ate = tag
+            return
+        if self.descartar_ate or tag not in self.TAGS_PERMITIDAS:
+            return
+        if tag == "a":
+            href = ""
+            for nome, valor in attrs:
+                if nome.lower() == "href" and valor and url_segura(valor):
+                    href = valor.strip()
+                    break
+            if href:
+                self.partes.append(f'<a href="{html.escape(href, quote=True)}">')
+            else:
+                self.partes.append("<a>")
+            return
+        if tag == "br":
+            self.partes.append("<br>")
+            return
+        # Mantém tags sem atributos para evitar evento JS/style inline.
+        self.partes.append(f"<{tag}>")
+
+    def handle_endtag(self, tag):
+        tag = tag.lower()
+        if self.descartar_ate:
+            if tag == self.descartar_ate:
+                self.descartar_ate = None
+            return
+        if tag in self.TAGS_PERMITIDAS and tag != "br":
+            self.partes.append(f"</{tag}>")
+
+    def handle_data(self, data):
+        if not self.descartar_ate:
+            self.partes.append(html.escape(data, quote=False))
+
+    def get_html(self) -> str:
+        return "".join(self.partes)
+
+
+def sanitizar_html_fragmento(fragmento: str) -> str:
+    parser = SanitizadorHTML()
+    parser.feed(fragmento)
+    parser.close()
+    return parser.get_html()
+
+
+def markdown_links_para_html(texto: str) -> str:
     def repl(match):
-        rotulo = html.escape(match.group(1), quote=True)
+        rotulo = html.escape(match.group(1), quote=False)
         url = match.group(2).strip()
-        # Mantém conservador: permite links relativos e URLs comuns, sempre escapados.
-        href = html.escape(url, quote=True)
-        links.append(f'<a href="{href}">{rotulo}</a>')
-        return marcador.format(len(links) - 1)
+        if not url_segura(url):
+            return rotulo
+        return f'<a href="{html.escape(url, quote=True)}">{rotulo}</a>'
+    return re.sub(r"\[([^\]]+)\]\(([^)]+)\)", repl, texto)
 
-    texto_marcado = re.sub(r"\[([^\]]+)\]\(([^)]+)\)", repl, texto)
-    texto_seguro = html.escape(texto_marcado, quote=True)
 
-    for i, link in enumerate(links):
-        texto_seguro = texto_seguro.replace(html.escape(marcador.format(i), quote=True), link)
-
-    # Negrito/itálico simples, depois do escape para evitar HTML cru.
-    texto_seguro = re.sub(r"\*\*([^*]+)\*\*", r"<strong>\1</strong>", texto_seguro)
-    texto_seguro = re.sub(r"`([^`]+)`", r"<code>\1</code>", texto_seguro)
-    return texto_seguro
+def markdown_inline(texto: str) -> str:
+    """Renderização segura de Markdown inline + HTML básico permitido."""
+    texto = markdown_links_para_html(texto)
+    texto = sanitizar_html_fragmento(texto)
+    texto = re.sub(r"\*\*([^*]+)\*\*", r"<strong>\1</strong>", texto)
+    texto = re.sub(r"`([^`]+)`", r"<code>\1</code>", texto)
+    return texto
 
 
 def fechar_lista(saida, tipo_lista) -> None:
@@ -75,11 +159,14 @@ def fechar_lista(saida, tipo_lista) -> None:
         saida.append(f"</{tipo_lista}>")
 
 
+def linha_html_segura(stripped: str) -> bool:
+    return bool(re.match(r"^</?(p|ul|ol|li|strong|b|em|i|code|pre|br|blockquote|h[1-6]|a)(\s|>|/)", stripped, re.IGNORECASE))
+
+
 def renderizar_readme_markdown(caminho: Path) -> str:
     """
     Renderizador Markdown básico, sem dependências externas.
-    Suporta títulos, parágrafos, listas simples, blocos de código e links.
-    Se o README tiver algo avançado, ainda aparece de forma segura.
+    Suporta títulos, parágrafos, listas, blocos de código, links e HTML básico seguro.
     """
     texto = caminho.read_text(encoding="utf-8", errors="replace")
     linhas = texto.splitlines()
@@ -110,6 +197,22 @@ def renderizar_readme_markdown(caminho: Path) -> str:
         if not stripped:
             fechar_lista(saida, tipo_lista)
             tipo_lista = None
+            continue
+
+        # Ignora wrappers visuais comuns do README do GitHub, como <p align="left">
+        # quando usados apenas para envolver listas. Isso evita HTML inválido <p><ul>...</ul></p>.
+        if re.match(r"^<p\b[^>]*>\s*$", stripped, re.IGNORECASE) or re.match(r"^</p>\s*$", stripped, re.IGNORECASE):
+            fechar_lista(saida, tipo_lista)
+            tipo_lista = None
+            continue
+
+        # HTML básico seguro no README: evita aparecer &lt;ul&gt; / &lt;li&gt; na página.
+        if linha_html_segura(stripped):
+            fechar_lista(saida, tipo_lista)
+            tipo_lista = None
+            seguro = sanitizar_html_fragmento(stripped)
+            if seguro:
+                saida.append(seguro)
             continue
 
         heading = re.match(r"^(#{1,6})\s+(.+)$", stripped)
@@ -161,10 +264,9 @@ def bloco_readme_raiz(raiz: Path) -> list[str]:
 
     return [
         "<!-- README.md (PAGINA INICIAL) -->",
-        '<section class="readme-box">',
+        '<section class="readme-card">',
         conteudo,
         "</section>",
-        "<hr/>",
     ]
 
 
@@ -200,13 +302,252 @@ def encontrar_repos_mais_recentes(repos_one):
     return sorted((p for v, p in repos_one if v == maior), key=lambda x: x.as_posix().lower())
 
 
-def pasta_tem_zip(pasta: Path, pastas_com_zip: set[Path]) -> bool:
-    return any(caminho_relativo(pasta_zip, pasta) for pasta_zip in pastas_com_zip)
+def itens_da_pasta(pasta: Path, pastas_com_zip: set[Path]) -> list[tuple[str, Path]]:
+    itens = []
+    for item in sorted(pasta.iterdir(), key=lambda x: (not x.is_dir(), x.name.lower())):
+        if item.name.startswith(".") or item.name == "index.html":
+            continue
+        if item.is_dir() and pasta_tem_zip(item, pastas_com_zip):
+            itens.append(("dir", item))
+        elif item.is_file() and item.suffix.lower() == ".zip":
+            itens.append(("zip", item))
+    return itens
 
 
-def href_nome(nome: str) -> str:
-    """Escapa nomes de arquivo/pasta para uso seguro em href local."""
-    return quote(nome, safe="")
+def bloco_repositorio_kodi(raiz: Path, repos_recentes: list[Path]) -> str:
+    if not repos_recentes:
+        return ""
+
+    bloco = [
+        "",
+        KODI_BLOCK_COMMENT,
+        '<div id="Repositorio-KODI" style="display:none">',
+        "<table>",
+    ]
+    for repo in repos_recentes:
+        rel = repo.relative_to(raiz).as_posix()
+        rel_html = html.escape(rel, quote=True)
+        rel_href = quote(rel, safe="/")
+        bloco.append(f'<tr><td><a href="{rel_href}">{rel_html}</a></td></tr>')
+    bloco += ["</table>", "</div>"]
+    return "\n".join(bloco)
+
+
+def css_base() -> list[str]:
+    return [
+        "* { box-sizing:border-box; }",
+        "body { margin:0; font-family:system-ui,-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif; background:#f4f6f8; color:#1f2937; }",
+        "a { color:#0066cc; text-decoration:none; font-weight:600; }",
+        "a:hover { text-decoration:underline; }",
+        "h1,h2,h3 { color:#111827; }",
+    ]
+
+
+def gerar_index_raiz(raiz: Path, pastas_com_zip: set[Path], todos_zips: list[Path], repos_recentes: list[Path]) -> str:
+    itens = itens_da_pasta(raiz, pastas_com_zip)
+    total_pastas = sum(1 for tipo, _ in itens if tipo == "dir")
+    total_zips_raiz = sum(1 for tipo, _ in itens if tipo == "zip")
+    total_zips_geral = len(todos_zips)
+
+    css = css_base() + [
+        "body { min-height:100vh; background:linear-gradient(135deg,#07111f 0%,#13263b 42%,#f4f6f8 42%,#f4f6f8 100%); }",
+        ".page-shell { width:min(1180px, calc(100% - 32px)); margin:0 auto; padding:32px 0 44px; }",
+        ".hero { color:#fff; padding:30px 0 26px; }",
+        ".badge { display:inline-flex; align-items:center; gap:8px; padding:7px 12px; border:1px solid rgba(255,255,255,.24); border-radius:999px; background:rgba(255,255,255,.08); font-size:13px; letter-spacing:.02em; }",
+        ".hero h1 { color:#fff; margin:16px 0 8px; font-size:clamp(30px, 5vw, 52px); line-height:1.03; }",
+        ".hero p { max-width:760px; margin:0; color:#dce8f7; font-size:17px; line-height:1.6; }",
+        ".layout { display:grid; grid-template-columns:minmax(0, 1.05fr) minmax(300px, .95fr); gap:22px; align-items:start; }",
+        ".card { background:#fff; border:1px solid #e5e7eb; border-radius:18px; box-shadow:0 18px 44px rgba(15,23,42,.12); }",
+        ".readme-card { padding:24px; }",
+        ".readme-card h1 { margin:0 0 12px; font-size:28px; }",
+        ".readme-card h2 { margin:22px 0 8px; font-size:21px; }",
+        ".readme-card h3 { margin:18px 0 8px; }",
+        ".readme-card p { margin:0 0 13px; line-height:1.68; color:#374151; }",
+        ".readme-card ul,.readme-card ol { margin:12px 0 14px; padding-left:22px; line-height:1.68; color:#374151; }",
+        ".readme-card li { margin:8px 0; }",
+        ".readme-card code { background:#eef6ff; color:#075985; padding:3px 6px; border-radius:6px; font-weight:700; }",
+        ".readme-card strong { color:#111827; }",
+        ".panel { padding:20px; }",
+        ".panel-head { display:flex; align-items:flex-start; justify-content:space-between; gap:16px; margin-bottom:16px; }",
+        ".panel-head h2 { margin:0; font-size:22px; }",
+        ".panel-head p { margin:5px 0 0; color:#6b7280; font-size:14px; }",
+        ".stats { display:grid; grid-template-columns:repeat(3, minmax(0,1fr)); gap:10px; margin-bottom:16px; }",
+        ".stat { background:#f8fafc; border:1px solid #e5e7eb; border-radius:14px; padding:12px; }",
+        ".stat strong { display:block; font-size:22px; color:#111827; }",
+        ".stat span { font-size:12px; color:#6b7280; }",
+        ".search-wrap { position:relative; margin-bottom:14px; }",
+        "#search { width:100%; padding:12px 14px; border:1px solid #d1d5db; border-radius:12px; outline:none; font-size:15px; background:#fff; }",
+        "#search:focus { border-color:#2563eb; box-shadow:0 0 0 4px rgba(37,99,235,.12); }",
+        ".listing-grid { display:grid; grid-template-columns:1fr; gap:9px; max-height:680px; overflow:auto; padding-right:4px; }",
+        ".entry { display:flex; align-items:center; gap:12px; padding:12px 13px; border:1px solid #e5e7eb; border-radius:14px; background:#fff; color:#111827; transition:.15s ease; }",
+        ".entry:hover { transform:translateY(-1px); box-shadow:0 8px 22px rgba(15,23,42,.08); text-decoration:none; border-color:#bfdbfe; }",
+        ".entry-icon { width:34px; height:34px; display:grid; place-items:center; border-radius:10px; background:#eff6ff; flex:0 0 auto; }",
+        ".entry strong { display:block; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; max-width:100%; }",
+        ".entry small { display:block; margin-top:2px; color:#6b7280; font-weight:500; }",
+        ".empty { padding:18px; text-align:center; color:#6b7280; border:1px dashed #d1d5db; border-radius:14px; background:#f9fafb; }",
+        ".footer-note { margin-top:18px; color:#6b7280; font-size:12px; text-align:center; }",
+        "@media (max-width:900px) { body { background:#f4f6f8; } .hero { color:#111827; padding-top:20px; } .hero h1 { color:#111827; } .hero p { color:#4b5563; } .badge { color:#1f2937; border-color:#d1d5db; background:#fff; } .layout { grid-template-columns:1fr; } }",
+        "@media (max-width:560px) { .page-shell { width:min(100% - 20px, 1180px); padding-top:18px; } .readme-card,.panel { padding:16px; border-radius:14px; } .stats { grid-template-columns:1fr; } }",
+    ]
+
+    linhas = [
+        "<!DOCTYPE html>",
+        "<html lang='pt-BR'>",
+        "<head>",
+        '<meta charset="utf-8">',
+        '<meta name="viewport" content="width=device-width, initial-scale=1">',
+        "<title>Repositório OnePlayHD</title>",
+        "<style>",
+        *css,
+        "</style>",
+        "</head>",
+        "<body>",
+        '<main class="page-shell">',
+        '<section class="hero">',
+        '<div class="badge">📦 Repositório Kodi • GitHub Pages</div>',
+        "<h1>Repositório OnePlayHD</h1>",
+        "<p>Arquivos organizados para instalação via Kodi. Use a busca para localizar rapidamente repositórios, plugins, scripts e dependências disponíveis.</p>",
+        "</section>",
+        '<section class="layout">',
+        '<div class="card">',
+    ]
+
+    readme = bloco_readme_raiz(raiz)
+    if readme:
+        linhas.extend(readme)
+    else:
+        linhas.extend([
+            '<section class="readme-card">',
+            "<h1>Repositório disponível</h1>",
+            "<p>Adicione um arquivo README.md na raiz para exibir instruções nesta área.</p>",
+            "</section>",
+        ])
+
+    linhas.extend([
+        "</div>",
+        '<aside class="card panel">',
+        '<div class="panel-head">',
+        "<div>",
+        "<h2>Arquivos disponíveis</h2>",
+        "<p>Pastas e pacotes ZIP encontrados no repositório.</p>",
+        "</div>",
+        "</div>",
+        '<div class="stats">',
+        f'<div class="stat"><strong>{total_pastas}</strong><span>pastas</span></div>',
+        f'<div class="stat"><strong>{total_zips_raiz}</strong><span>ZIPs na raiz</span></div>',
+        f'<div class="stat"><strong>{total_zips_geral}</strong><span>ZIPs no total</span></div>',
+        "</div>",
+        '<div class="search-wrap"><input type="text" id="search" placeholder="Pesquisar arquivos ou pastas..."></div>',
+        '<div id="listing" class="listing-grid">',
+    ])
+
+    itens_js = []
+    for tipo, item in itens:
+        nome_html = html.escape(item.name, quote=True)
+        nome_norm = remover_acentos(item.name)
+        if tipo == "dir":
+            href = f'./{href_nome(item.name)}/index.html'
+            card = (
+                f'<a class="entry folder" href="{href}">'
+                f'<span class="entry-icon">📁</span>'
+                f'<span><strong>{nome_html}/</strong><small>Pasta com arquivos ZIP</small></span>'
+                f'</a>'
+            )
+        else:
+            href = f'./{href_nome(item.name)}'
+            card = (
+                f'<a class="entry zip" href="{href}">'
+                f'<span class="entry-icon">📦</span>'
+                f'<span><strong>{nome_html}</strong><small>Arquivo ZIP</small></span>'
+                f'</a>'
+            )
+        linhas.append(card)
+        itens_js.append([nome_norm, card])
+
+    linhas.extend([
+        "</div>",
+        '<div class="footer-note">Página gerada automaticamente pelo GitHub Actions.</div>',
+        "</aside>",
+        "</section>",
+        "</main>",
+        "<script>",
+        f"const items = {json.dumps(itens_js, ensure_ascii=False)};",
+        "const input = document.getElementById('search');",
+        "const listing = document.getElementById('listing');",
+        "const empty = '<div class=\"empty\">Nenhum resultado encontrado.</div>';",
+        "input.addEventListener('input', () => {",
+        "  const t = input.value.normalize('NFD').replace(/[\\u0300-\\u036f]/g, '').toLowerCase();",
+        "  const result = items.filter(i => i[0].includes(t)).map(i => i[1]).join('');",
+        "  listing.innerHTML = result || empty;",
+        "});",
+        "</script>",
+        "</body>",
+        "</html>",
+    ])
+
+    content = "\n".join(linhas)
+    bloco = bloco_repositorio_kodi(raiz, repos_recentes)
+    if bloco:
+        content += "\n" + bloco
+    return content
+
+
+def gerar_index_subpasta(pasta: Path, raiz: Path, pastas_com_zip: set[Path]) -> str:
+    """Mantém as subpastas no formato simples/leve já aprovado."""
+    css = css_base() + [
+        "body { padding:24px; }",
+        "h1 { margin-bottom:8px; }",
+        "hr { border:0; border-top:1px solid #ddd; margin:12px 0 20px; }",
+        "pre { background:#fff; padding:14px; border-radius:10px; box-shadow:0 4px 14px rgba(0,0,0,.08); line-height:1.6; overflow:auto; }",
+        "#search { padding:8px 12px; width:min(320px,100%); border-radius:6px; border:1px solid #ccc; margin-bottom:16px; box-sizing:border-box; }",
+        ".voltar { display:inline-block; margin-bottom:16px; padding:6px 14px; border-radius:999px; border:1px solid #0066cc; color:#0066cc; transition:.2s; }",
+        ".voltar:hover { background:#0066cc; color:#fff; text-decoration:none; }",
+    ]
+
+    linhas = [
+        "<!DOCTYPE html>",
+        "<html lang='pt-BR'>",
+        "<head>",
+        '<meta charset="utf-8">',
+        '<meta name="viewport" content="width=device-width, initial-scale=1">',
+        "<title>Directory listing</title>",
+        "<style>",
+        *css,
+        "</style>",
+        "</head>",
+        "<body>",
+        "<h1>Directory listing</h1>",
+        "<hr/>",
+        '<a class="voltar" href="../index.html">← Voltar</a>',
+        '<input type="text" id="search" placeholder="Pesquisar arquivos ou pastas...">',
+        "<pre id='listing'>",
+    ]
+
+    itens_js = []
+    for tipo, item in itens_da_pasta(pasta, pastas_com_zip):
+        nome_html = html.escape(item.name, quote=True)
+        if tipo == "dir":
+            linha = f'📁 <a href="./{href_nome(item.name)}/index.html">{nome_html}/</a>'
+        else:
+            linha = f'📦 <a href="./{href_nome(item.name)}">{nome_html}</a>'
+        linhas.append(linha)
+        itens_js.append([remover_acentos(item.name), linha])
+
+    linhas.extend([
+        "</pre>",
+        "<script>",
+        f"const items = {json.dumps(itens_js, ensure_ascii=False)};",
+        "const input = document.getElementById('search');",
+        "const listing = document.getElementById('listing');",
+        "input.addEventListener('input', () => {",
+        "  const t = input.value.normalize('NFD').replace(/[\\u0300-\\u036f]/g, '').toLowerCase();",
+        "  listing.innerHTML = items.filter(i => i[0].includes(t)).map(i => i[1]).join('\\n');",
+        "});",
+        "</script>",
+        "</body>",
+        "</html>",
+    ])
+    return "\n".join(linhas)
 
 
 # Index handling
@@ -214,6 +555,7 @@ def gerar_ou_remover_index(
     pasta: Path,
     raiz: Path,
     pastas_com_zip: set[Path],
+    todos_zips: list[Path],
     tem_zip_geral: bool,
     repos_recentes: list[Path]
 ):
@@ -234,104 +576,10 @@ def gerar_ou_remover_index(
             print(f"🧹 removido: {index.relative_to(raiz)}")
         return
 
-    linhas_html = [
-        "<!DOCTYPE html>",
-        "<html lang='pt-BR'>",
-        "<head>",
-        '<meta charset="utf-8">',
-        '<meta name="viewport" content="width=device-width, initial-scale=1">',
-        "<title>Directory listing</title>",
-        "<style>",
-        "body { font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif; background:#f4f6f8; color:#222; padding:24px; }",
-        "h1 { margin-bottom:8px; }",
-        "hr { border:0; border-top:1px solid #ddd; margin:12px 0 20px; }",
-        "pre { background:#fff; padding:14px; border-radius:10px; box-shadow:0 4px 14px rgba(0,0,0,.08); line-height:1.6; overflow:auto; }",
-        "a { color:#0066cc; text-decoration:none; font-weight:500; }",
-        "a:hover { text-decoration:underline; }",
-        "#search { padding:8px 12px; width:min(320px, 100%); border-radius:6px; border:1px solid #ccc; margin-bottom:16px; box-sizing:border-box; }",
-        ".voltar { display:inline-block; margin-bottom:16px; padding:6px 14px; border-radius:999px; border:1px solid #0066cc; color:#0066cc; transition:.2s; }",
-        ".voltar:hover { background:#0066cc; color:#fff; text-decoration:none; }",
-    ]
-
-    # Estilo extra somente na página inicial, quando o README.md pode aparecer.
     if pasta == raiz:
-        linhas_html.extend([
-            ".readme-box { background:#fff; padding:18px 20px; border-radius:12px; box-shadow:0 4px 14px rgba(0,0,0,.08); margin:0 0 18px; max-width:980px; }",
-            ".readme-box h1, .readme-box h2, .readme-box h3 { margin-top:0.75em; }",
-            ".readme-box p { line-height:1.6; }",
-            ".readme-box code { background:#f1f3f5; padding:2px 5px; border-radius:5px; }",
-            ".readme-box pre { box-shadow:none; border:1px solid #e5e7eb; }",
-            ".readme-box ul, .readme-box ol { line-height:1.6; }",
-        ])
-
-    linhas_html.extend([
-        "</style>",
-        "</head>",
-        "<body>",
-        "<h1>Directory listing</h1>",
-        "<hr/>",
-    ])
-
-    if pasta == raiz:
-        linhas_html.extend(bloco_readme_raiz(raiz))
-
-    if pasta != raiz:
-        linhas_html.append('<a class="voltar" href="../index.html">← Voltar</a>')
-
-    linhas_html.append('<input type="text" id="search" placeholder="Pesquisar arquivos ou pastas...">')
-    linhas_html.append("<pre id='listing'>")
-
-    itens = []
-    for item in sorted(pasta.iterdir(), key=lambda x: (not x.is_dir(), x.name.lower())):
-        if item.name.startswith(".") or item.name == "index.html":
-            continue
-
-        nome_html = html.escape(item.name, quote=True)
-        nome_href = href_nome(item.name)
-
-        if item.is_dir() and pasta_tem_zip(item, pastas_com_zip):
-            linha = f'📁 <a href="./{nome_href}/index.html">{nome_html}/</a>'
-        elif item.is_file() and item.suffix.lower() == ".zip":
-            linha = f'📦 <a href="./{nome_href}">{nome_html}</a>'
-        else:
-            continue
-
-        linhas_html.append(linha)
-        itens.append([remover_acentos(item.name), linha])
-
-    linhas_html.extend([
-        "</pre>",
-        "<script>",
-        f"const items = {json.dumps(itens, ensure_ascii=False)};",
-        "const input = document.getElementById('search');",
-        "const listing = document.getElementById('listing');",
-        "input.addEventListener('input', () => {",
-        "  const t = input.value.normalize('NFD').replace(/[\\u0300-\\u036f]/g, '').toLowerCase();",
-        "  listing.innerHTML = items.filter(i => i[0].includes(t)).map(i => i[1]).join('\\n');",
-        "});",
-        "</script>",
-        "</body>",
-        "</html>",
-    ])
-
-    content = "\n".join(linhas_html)
-
-    # Bloco externo usado pelo Kodi/cliente para localizar o One.repo mais recente.
-    # Fica fora do HTML por compatibilidade com o comportamento anterior.
-    if pasta == raiz and repos_recentes:
-        bloco = [
-            "",
-            "<!-- REPOSITORIO KODI (FORA DO HTML) -->",
-            '<div id="Repositorio-KODI" style="display:none">',
-            "<table>",
-        ]
-        for repo in repos_recentes:
-            rel = repo.relative_to(raiz).as_posix()
-            rel_html = html.escape(rel, quote=True)
-            rel_href = quote(rel, safe="/")
-            bloco.append(f'<tr><td><a href="{rel_href}">{rel_html}</a></td></tr>')
-        bloco += ["</table>", "</div>"]
-        content += "\n" + "\n".join(bloco)
+        content = gerar_index_raiz(raiz, pastas_com_zip, todos_zips, repos_recentes)
+    else:
+        content = gerar_index_subpasta(pasta, raiz, pastas_com_zip)
 
     index.write_text(content, encoding="utf-8", newline="\n")
     print(f"✔ index atualizado: {index.relative_to(raiz)}")
@@ -356,6 +604,7 @@ if __name__ == "__main__":
         raiz,
         raiz,
         pastas_com_zip,
+        todos_zips,
         tem_zip_geral,
         repos_recentes,
     )
