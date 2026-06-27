@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<addon id="plugin.video.puretorrent" name="PURE TORRENT" version="1.0.1" provider-name="Equipe OnePlay">
+<addon id="plugin.video.puretorrent" name="PURE TORRENT" version="1.0.2" provider-name="Equipe OnePlay">
     <requires>
         <import addon="xbmc.python" version="3.0.0"/>
     </requires>
@@ -11,8 +11,8 @@
     <extension point="xbmc.addon.metadata">
         <platform>all</platform>
         <license>Apache-2.0</license>
-        <summary lang="pt_BR">Streamer de Torrent em Python Puro sem Binários</summary>
-        <description lang="pt_BR">Addon para reproduzir links magnet de torrent diretamente do Kodi. Desenvolvido inteiramente em Python puro (sem binários compilados), sendo compatível com qualquer plataforma (Android, Windows, Linux, Raspberry Pi, etc.). Suporta Range Requests (Partial Content) para avanço de vídeo rápido e prioriza arquivos MKV e MP4 e navega por pastas, temporadas e subpastas em torrents multifile.</description>
+        <summary lang="pt_BR">Streamer de Torrent em Python Puro — ação direta de magnet manual auditada</summary>
+        <description lang="pt_BR">Addon para reproduzir magnets diretamente no Kodi em Python puro. Usa a API Wasmer para identificar rapidamente arquivos, pastas e temporadas; a API Wasmer identifica arquivos rapidamente e a interceptação de magnets encaminha links visíveis de outros addons. Antes do stream, valida a metadata BitTorrent via BEP 10 e cada peça por SHA-1. Reconhece containers de vídeo por registro único (MKV, AVI, MP4, TS, MOV, WEBM e outros), valida cada peça por SHA-1 e mantém Range Requests, seleção por subpastas, entrada manual direta sem item de pasta e encerramento seguro de sessão no Stop.</description>
         <disclaimer lang="pt_BR">Utilize apenas para reproduzir conteúdos de distribuição livre e código aberto.</disclaimer>
         <assets>
             <icon>icon.png</icon>
