@@ -499,7 +499,7 @@
       </assets>
     </extension>
   </addon>
-  <addon id="plugin.video.oneplayvip" version="0.2.7" name="[COLOR aquamarine][B]ONE[COLOR white]PLAY [COLOR aquamarine]VIP[/B][/COLOR]" provider-name="OnePlay">
+  <addon id="plugin.video.oneplayvip" version="0.2.8" name="[COLOR aquamarine][B]ONE[COLOR white]PLAY [COLOR aquamarine]VIP[/B][/COLOR]" provider-name="OnePlay">
     <requires>
       <import addon="xbmc.python" version="3.0.0"/>
       <import addon="script.module.requests"/>
@@ -511,11 +511,14 @@
     </extension>
     <extension point="xbmc.service" library="service.py" start="startup"/>
     <extension point="xbmc.addon.metadata">
-      <summary>OnePlay VIP é um plugin baseado no addon para Xtream Codes com TV, Filmes, Series, EPG e Busca Global</summary>
-      <description>Insira usuario e senha para acessar canais, VOD, series com temporadas/episodios, EPG e busca global.</description>
+      <summary lang="en_GB">Xtream Codes client with Live TV, VOD, series, background EPG and global search.</summary>
+      <summary lang="pt_BR">Cliente Xtream Codes com TV ao vivo, VOD, séries, EPG em background e busca global.</summary>
+      <description lang="en_GB">Access live channels, films and series through Xtream Codes. The optional background EPG builds a local Today and Tomorrow guide. DNS and Live/VOD Proxy features are disabled by default and can be enabled individually when required. The Stable profile and extra tolerance help poor Xtream sources.</description>
+      <description lang="pt_BR">Acesse canais ao vivo, filmes e séries pelo Xtream Codes. O EPG opcional em background monta uma guia local de Hoje e Amanhã. DNS e Proxy de Live/VOD começam desligados por padrão e podem ser ativados separadamente quando necessário. O perfil Estável e a tolerância extra ajudam fontes Xtream ruins.</description>
       <platform>all</platform>
       <license>GPL-2.0-or-later</license>
-      <disclaimer>OnePlay VIP, um addon para Kodi que permite acesso a conteudo de IPTV.</disclaimer>
+      <disclaimer lang="en_GB">A valid provider account is required. This add-on does not provide content. DNS and Proxy features are optional and disabled by default.</disclaimer>
+      <disclaimer lang="pt_BR">É necessário um acesso válido do provedor. Este addon não fornece conteúdo. DNS e Proxy são opcionais e começam desligados por padrão.</disclaimer>
       <assets>
         <icon>icon.png</icon>
         <fanart>fanart.jpg</fanart>
