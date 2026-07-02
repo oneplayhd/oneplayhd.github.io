@@ -1,33 +1,29 @@
-name: Atualizar índices e publicar GitHub Pages
+name: Consolidar índices e publicar GitHub Pages
 
 on:
   push:
     branches: ["master"]
-    # O commit gerado pelo bot altera apenas index.html. Ignorá-lo evita loop,
-    # mas qualquer ZIP, XML, MD5, imagem, README, adição ou remoção do painel
-    # continua disparando a consolidação e a publicação do Pages.
+    # O bot só cria/remove index.html. Esses commits não reiniciam o fluxo.
     paths-ignore:
       - "index.html"
       - "**/index.html"
   workflow_dispatch:
 
-# O repositório recebe vários commits por operação. O último commit vence;
-# execuções anteriores são canceladas e jamais publicam um estado ultrapassado.
+# Uma publicação mais nova substitui a anterior. Vários commits próximos
+# viram uma única publicação do estado final da master.
 concurrency:
   group: oneplay-pages-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
-  consolidar_e_empacotar:
-    name: Consolidar lote, gerar índices e empacotar Pages
+  consolidar:
+    name: Consolidar lote e gerar índices
     runs-on: ubuntu-latest
     timeout-minutes: 15
     permissions:
       contents: write
-      pages: write
-      id-token: write
     outputs:
-      deploy: ${{ steps.pronto.outputs.deploy }}
+      publish: ${{ steps.consolidar.outputs.publish }}
       source_sha: ${{ steps.consolidar.outputs.source_sha }}
 
     steps:
@@ -35,22 +31,20 @@ jobs:
         uses: actions/checkout@v6
         with:
           fetch-depth: 0
-          persist-credentials: true
 
       - name: Aguardar estabilização do lote
         shell: bash
         run: |
           set -euo pipefail
-          # Uma alteração isolada segue normalmente. Se novos commits chegarem,
-          # esta execução é cancelada e a mais nova recomeça a janela.
-          sleep 45
+          echo "Aguardando 30 segundos para o painel concluir uploads, atualizações e remoções..."
+          sleep 30
 
       - name: Configurar Python
         uses: actions/setup-python@v6
         with:
           python-version: "3.12"
 
-      - name: Consolidar a master e gerar todos os índices
+      - name: Gerar índices sobre a master mais recente
         id: consolidar
         shell: bash
         run: |
@@ -59,230 +53,173 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
-          final_sha=""
+          echo "publish=false" >> "$GITHUB_OUTPUT"
 
           for tentativa in 1 2 3 4 5 6 7 8; do
-            echo "Tentativa ${tentativa}/8: obtendo o estado mais recente da master..."
-            git fetch --prune --no-tags origin +refs/heads/master:refs/remotes/origin/master
+            echo "Tentativa ${tentativa}/8: sincronizando com origin/master..."
+            git fetch --no-tags origin +refs/heads/master:refs/remotes/origin/master
             git checkout --force -B master origin/master
             git clean -ffd
             base_sha="$(git rev-parse HEAD)"
 
-            # Não modificar generate_index.py: ele é a fonte única para criar,
-            # atualizar e remover index.html na raiz e em todas as subpastas.
+            # Mantém generate_index.py intacto: ele continua sendo a única
+            # fonte da lógica que cria, atualiza e remove os index.html.
             python generate_index.py
-            git add --all
+            git add -A
 
-            # Nunca produz/commita índices calculados sobre uma master que mudou.
-            remote_sha="$(git ls-remote origin refs/heads/master | awk 'NR==1 {print $1}')"
-            if [[ "$remote_sha" != "$base_sha" ]]; then
-              echo "A master mudou durante a geração; descartando este resultado."
+            # Não produz índice em cima de uma base que mudou durante a geração.
+            remoto_sha="$(git ls-remote origin refs/heads/master | awk 'NR==1 {print $1}')"
+            if [ "$remoto_sha" != "$base_sha" ]; then
+              echo "A master mudou durante a geração; descartando o resultado local."
               sleep 2
               continue
             fi
 
             if git diff --cached --quiet; then
+              echo "Os índices já representam a master atual."
               final_sha="$base_sha"
-            else
-              # Defesa: o bot só pode gravar index.html. ZIP, XML, MD5 e qualquer
-              # arquivo enviado pelo painel bloqueiam o push se aparecerem aqui.
-              unsafe=()
-              while IFS= read -r -d '' path; do
-                case "$path" in
-                  index.html|*/index.html) ;;
-                  *) unsafe+=("$path") ;;
-                esac
-              done < <(git diff --cached --name-only -z)
-
-              if (( ${#unsafe[@]} > 0 )); then
-                printf 'Alteração fora de index.html bloqueada por segurança:\n' >&2
-                printf ' - %s\n' "${unsafe[@]}" >&2
-                exit 1
-              fi
-
-              git commit -m "index.html"
-
-              if ! git push origin HEAD:refs/heads/master; then
-                echo "Um commit concorrente entrou antes do push; regenerando."
-                sleep 2
-                continue
-              fi
-
-              final_sha="$(git rev-parse HEAD)"
-            fi
-
-            # Se alguém publicou logo depois, a geração precisa ser refeita sobre
-            # a nova master. A execução posterior também pode cancelar esta.
-            remote_sha="$(git ls-remote origin refs/heads/master | awk 'NR==1 {print $1}')"
-            if [[ "$remote_sha" == "$final_sha" ]]; then
-              echo "Estado consolidado: $final_sha"
               break
             fi
 
-            echo "A master avançou após a consolidação; gerando novamente."
-            final_sha=""
+            # Cinto de segurança: o bot nunca grava ZIP, XML, MD5 ou qualquer
+            # outro arquivo do painel. Somente index.html pode entrar no commit.
+            python -c 'import subprocess,sys; raw=subprocess.check_output(["git","diff","--cached","--name-only","-z"]); paths=[p.decode("utf-8","surrogateescape") for p in raw.split(b"\0") if p]; unsafe=[p for p in paths if not (p=="index.html" or p.endswith("/index.html"))]; print("Alteração fora de index.html detectada; push bloqueado por segurança:\n" + "\n".join(unsafe)) if unsafe else None; sys.exit(1 if unsafe else 0)'
+
+            git commit -m "index.html"
+
+            if ! git push origin HEAD:refs/heads/master; then
+              echo "Outro commit entrou antes do push; regenerando sobre a master mais recente."
+              sleep 2
+              continue
+            fi
+
+            # Mesmo após o push, confirma que nenhum commit novo entrou antes
+            # de liberar o empacotamento do Pages.
+            final_sha="$(git rev-parse HEAD)"
+            remoto_sha="$(git ls-remote origin refs/heads/master | awk 'NR==1 {print $1}')"
+            if [ "$remoto_sha" = "$final_sha" ]; then
+              echo "Índices enviados e master estabilizada."
+              break
+            fi
+
+            echo "A master mudou logo após o push; gerando novamente."
+            unset final_sha
             sleep 2
           done
 
-          if [[ -z "$final_sha" ]]; then
-            # Em atividade contínua, já existe uma execução mais nova para o
-            # último commit. Encerrar limpo evita publicar estado antigo.
-            echo "A master permaneceu em movimento; a execução mais recente assumirá."
-            echo "source_sha=" >> "$GITHUB_OUTPUT"
+          if [ -z "${final_sha:-}" ]; then
+            # Atividade contínua: o commit mais novo já iniciou outra execução.
+            # Encerrar sem erro evita e-mail falso de falha e impede deploy velho.
+            echo "A master permaneceu em movimento. Esta execução encerra sem deploy; a mais recente consolidará o lote."
             exit 0
           fi
 
+          echo "publish=true" >> "$GITHUB_OUTPUT"
           echo "source_sha=$final_sha" >> "$GITHUB_OUTPUT"
 
-      - name: Confirmar que a master ainda é o estado consolidado
-        id: pronto
+  empacotar:
+    name: Empacotar estado consolidado do Pages
+    needs: consolidar
+    if: needs.consolidar.outputs.publish == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: read
+    outputs:
+      deploy: ${{ steps.validar_final.outputs.deploy }}
+
+    steps:
+      - name: Checkout exato para publicação
+        uses: actions/checkout@v6
+        with:
+          ref: ${{ needs.consolidar.outputs.source_sha }}
+          fetch-depth: 1
+
+      - name: Validar que a master ainda é a origem consolidada
+        id: validar_origem
         shell: bash
         env:
-          SOURCE_SHA: ${{ steps.consolidar.outputs.source_sha }}
+          EXPECTED_SHA: ${{ needs.consolidar.outputs.source_sha }}
         run: |
           set -euo pipefail
-
-          if [[ -z "$SOURCE_SHA" ]]; then
-            echo "deploy=false" >> "$GITHUB_OUTPUT"
+          atual="$(git ls-remote origin refs/heads/master | awk 'NR==1 {print $1}')"
+          if [ "$atual" != "$EXPECTED_SHA" ]; then
+            echo "A master avançou antes do empacotamento. A execução mais nova assumirá o deploy."
+            echo "ready=false" >> "$GITHUB_OUTPUT"
             exit 0
           fi
-
-          remote_sha="$(git ls-remote origin refs/heads/master | awk 'NR==1 {print $1}')"
-          if [[ "$remote_sha" != "$SOURCE_SHA" ]]; then
-            echo "A master avançou; o workflow mais novo fará a publicação."
-            echo "deploy=false" >> "$GITHUB_OUTPUT"
-            exit 0
-          fi
-
-          git checkout --detach "$SOURCE_SHA"
-          git clean -ffd
-          echo "deploy=true" >> "$GITHUB_OUTPUT"
+          echo "ready=true" >> "$GITHUB_OUTPUT"
 
       - name: Configurar GitHub Pages
-        if: steps.pronto.outputs.deploy == 'true'
-        uses: actions/configure-pages@v5
+        if: steps.validar_origem.outputs.ready == 'true'
+        uses: actions/configure-pages@v6.0.0
 
-      - name: Criar artefato do estado consolidado
-        if: steps.pronto.outputs.deploy == 'true'
+      - name: Criar artefato do Pages
+        if: steps.validar_origem.outputs.ready == 'true'
         uses: actions/upload-pages-artifact@v4
         with:
-          # Preserva o comportamento necessário para Kodi e site: ZIPs, XMLs,
-          # MD5s, imagens e os index.html produzidos pelo generate_index.py.
+          # Publica o repositório inteiro: ZIPs, XMLs, MD5s e todos os índices.
           path: "."
 
+      - name: Confirmar a origem antes do deploy
+        id: validar_final
+        shell: bash
+        env:
+          READY: ${{ steps.validar_origem.outputs.ready }}
+          EXPECTED_SHA: ${{ needs.consolidar.outputs.source_sha }}
+        run: |
+          set -euo pipefail
+          if [ "$READY" != "true" ]; then
+            echo "deploy=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          atual="$(git ls-remote origin refs/heads/master | awk 'NR==1 {print $1}')"
+          if [ "$atual" != "$EXPECTED_SHA" ]; then
+            echo "A master mudou após o artefato; deploy cancelado para não publicar índice desatualizado."
+            echo "deploy=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          echo "deploy=true" >> "$GITHUB_OUTPUT"
+
   publicar:
-    name: Publicar o estado consolidado no GitHub Pages
-    needs: consolidar_e_empacotar
-    if: needs.consolidar_e_empacotar.outputs.deploy == 'true'
+    name: Publicar no GitHub Pages
+    needs: [consolidar, empacotar]
+    if: needs.empacotar.outputs.deploy == 'true'
     runs-on: ubuntu-latest
-    timeout-minutes: 25
+    timeout-minutes: 15
     permissions:
       contents: read
       pages: write
       id-token: write
     environment:
       name: github-pages
-      url: ${{ steps.deploy_1.outputs.page_url || steps.deploy_2.outputs.page_url || steps.deploy_3.outputs.page_url }}
+      url: ${{ steps.deployment.outputs.page_url }}
 
     steps:
-      - name: Validar a origem antes da tentativa 1
-        id: gate_1
-        shell: bash
-        env:
-          SOURCE_SHA: ${{ needs.consolidar_e_empacotar.outputs.source_sha }}
-        run: |
-          set -euo pipefail
-          remote_sha="$(git ls-remote origin refs/heads/master | awk 'NR==1 {print $1}')"
-          [[ "$remote_sha" == "$SOURCE_SHA" ]] && echo "current=true" >> "$GITHUB_OUTPUT" || echo "current=false" >> "$GITHUB_OUTPUT"
-
-      - name: Deploy Pages — tentativa 1
-        id: deploy_1
-        if: steps.gate_1.outputs.current == 'true'
-        continue-on-error: true
-        uses: actions/deploy-pages@v5
+      - name: Confirmar que não há versão mais nova
+        id: validar_deploy
+        uses: actions/checkout@v6
         with:
-          # Cinco minutos por tentativa; evita ficar preso dez minutos em uma
-          # fila global. Há até três tentativas, sempre da mesma revisão.
-          timeout: "300000"
-          error_count: "10"
-          reporting_interval: "5000"
+          ref: ${{ needs.consolidar.outputs.source_sha }}
+          fetch-depth: 1
 
-      - name: Esperar antes da tentativa 2
-        if: steps.deploy_1.outcome == 'failure'
-        shell: bash
-        run: sleep 60
-
-      - name: Validar a origem antes da tentativa 2
-        id: gate_2
-        if: steps.deploy_1.outcome == 'failure'
+      - name: Bloquear deploy obsoleto
+        id: porta
         shell: bash
         env:
-          SOURCE_SHA: ${{ needs.consolidar_e_empacotar.outputs.source_sha }}
+          EXPECTED_SHA: ${{ needs.consolidar.outputs.source_sha }}
         run: |
           set -euo pipefail
-          remote_sha="$(git ls-remote origin refs/heads/master | awk 'NR==1 {print $1}')"
-          [[ "$remote_sha" == "$SOURCE_SHA" ]] && echo "current=true" >> "$GITHUB_OUTPUT" || echo "current=false" >> "$GITHUB_OUTPUT"
-
-      - name: Deploy Pages — tentativa 2
-        id: deploy_2
-        if: steps.deploy_1.outcome == 'failure' && steps.gate_2.outputs.current == 'true'
-        continue-on-error: true
-        uses: actions/deploy-pages@v5
-        with:
-          timeout: "300000"
-          error_count: "10"
-          reporting_interval: "5000"
-
-      - name: Esperar antes da tentativa 3
-        if: steps.deploy_2.outcome == 'failure'
-        shell: bash
-        run: sleep 60
-
-      - name: Validar a origem antes da tentativa 3
-        id: gate_3
-        if: steps.deploy_2.outcome == 'failure'
-        shell: bash
-        env:
-          SOURCE_SHA: ${{ needs.consolidar_e_empacotar.outputs.source_sha }}
-        run: |
-          set -euo pipefail
-          remote_sha="$(git ls-remote origin refs/heads/master | awk 'NR==1 {print $1}')"
-          [[ "$remote_sha" == "$SOURCE_SHA" ]] && echo "current=true" >> "$GITHUB_OUTPUT" || echo "current=false" >> "$GITHUB_OUTPUT"
-
-      - name: Deploy Pages — tentativa 3
-        id: deploy_3
-        if: steps.deploy_2.outcome == 'failure' && steps.gate_3.outputs.current == 'true'
-        continue-on-error: true
-        uses: actions/deploy-pages@v5
-        with:
-          timeout: "300000"
-          error_count: "10"
-          reporting_interval: "5000"
-
-      - name: Veredito do Pages
-        if: always()
-        shell: bash
-        env:
-          ATTEMPT_1: ${{ steps.deploy_1.outcome }}
-          ATTEMPT_2: ${{ steps.deploy_2.outcome }}
-          ATTEMPT_3: ${{ steps.deploy_3.outcome }}
-          GATE_1: ${{ steps.gate_1.outputs.current }}
-          GATE_2: ${{ steps.gate_2.outputs.current }}
-          GATE_3: ${{ steps.gate_3.outputs.current }}
-        run: |
-          set -euo pipefail
-
-          if [[ "$ATTEMPT_1" == "success" || "$ATTEMPT_2" == "success" || "$ATTEMPT_3" == "success" ]]; then
-            echo "GitHub Pages publicado com sucesso."
+          atual="$(git ls-remote origin refs/heads/master | awk 'NR==1 {print $1}')"
+          if [ "$atual" != "$EXPECTED_SHA" ]; then
+            echo "Chegou uma versão mais nova; este deploy será ignorado."
+            echo "deploy=false" >> "$GITHUB_OUTPUT"
             exit 0
           fi
+          echo "deploy=true" >> "$GITHUB_OUTPUT"
 
-          # Um commit mais novo surgiu: a execução correspondente é a única que
-          # pode publicar. Não transformar essa proteção em e-mail de falha.
-          if [[ "$GATE_1" == "false" || "$GATE_2" == "false" || "$GATE_3" == "false" ]]; then
-            echo "A master avançou durante o deploy; esta execução não publica estado antigo."
-            exit 0
-          fi
-
-          echo "O GitHub Pages recusou três tentativas para a mesma revisão." >&2
-          exit 1
+      - name: Deploy para GitHub Pages
+        if: steps.porta.outputs.deploy == 'true'
+        id: deployment
+        uses: actions/deploy-pages@v4
