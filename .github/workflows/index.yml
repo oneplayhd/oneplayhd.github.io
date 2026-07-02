@@ -100,7 +100,7 @@ jobs:
                 exit 1
               fi
 
-              git commit -m "index.htmls"
+              git commit -m "index.html"
 
               if ! git push origin HEAD:refs/heads/master; then
                 echo "Um commit concorrente entrou antes do push; regenerando."
