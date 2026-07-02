@@ -1,5 +1,7 @@
 name: Legacy Pages deploy (desativado)
 
+# Não publica automaticamente. A publicação oficial é feita pelo index.yml,
+# que executa generate_index.py e depois faz um único deploy do GitHub Pages.
 on:
   workflow_dispatch:
 
@@ -9,5 +11,5 @@ jobs:
     steps:
       - name: Aviso
         run: |
-          echo "Este workflow foi desativado."
-          echo "A publicacao oficial agora ocorre no index.yml, acionada pelo commit final de addons.xml."
+          echo "Workflow antigo desativado para impedir deploys duplicados."
+          echo "Para publicar manualmente, execute o workflow: Atualizar indice e publicar GitHub Pages."
