@@ -749,7 +749,7 @@ v1.0.0
       </assets>
     </extension>
   </addon>
-  <addon id="plugin.video.thethunder" version="1.5.2" name="[COLOR violet]THUNDER[/COLOR]" provider-name="OnePlay Team">
+  <addon id="plugin.video.thethunder" version="1.5.3" name="[COLOR violet]THUNDER[/COLOR]" provider-name="OnePlay Team">
     <requires>
       <import addon="script.module.requests"/>
       <import addon="script.module.cloudrequest"/>
@@ -761,6 +761,7 @@ v1.0.0
     <extension point="xbmc.python.pluginsource" library="default.py">
       <provides>video</provides>
     </extension>
+    <extension point="xbmc.service" library="resources/lib/kodi_service.py" start="startup"/>
     <extension point="xbmc.addon.metadata">
       <summary lang="en">Thunder e um addon da equipe oneplay que busca conteudo na internet</summary>
       <summary lang="pt">Thunder e um addon da equipe oneplay que busca conteudo na internet</summary>
