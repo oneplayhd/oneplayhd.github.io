@@ -477,7 +477,7 @@ v1.0.0
       </assets>
     </extension>
   </addon>
-  <addon id="plugin.video.ibo.oneplay" name="ONEPLAY IBO" version="2.3.4" provider-name="OnePlay">
+  <addon id="plugin.video.ibo.oneplay" name="ONEPLAY IBO" version="2.3.5" provider-name="OnePlay">
     <requires>
       <import addon="xbmc.python" version="3.0.0"/>
     </requires>
@@ -489,6 +489,7 @@ v1.0.0
       <summary lang="pt_BR">ONEPLAY IBO para Kodi integrado ao painel IBO</summary>
       <description lang="pt_BR">Experiência ONEPLAY IBO para Kodi 21, integrada ao painel com acesso por Device ID, TV ao vivo, Filmes e Séries, Favoritos, EPG, failover automático e Continuar Assistindo com retomada de reprodução.</description>
       <news>
+2.3.5: validação DNS, proteção do relay e Cast, downloads HTTPS e confirmação do PIN pelo painel.
 [COLOR lime]•[/COLOR] Integração com o painel IBO por Device ID, validação de acesso e Health/Heartbeat de sessão.
 [COLOR lime]•[/COLOR] TV ao vivo com EPG, Favoritos, failover de DNS/mídia e fallback técnico entre variantes do canal.
 [COLOR lime]•[/COLOR] Filmes e Séries com Favoritos, Continuar Assistindo e histórico isolado por portal.
