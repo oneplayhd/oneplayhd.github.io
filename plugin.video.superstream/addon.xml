@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<addon id="plugin.video.superstream" name="SuperStream" version="1.0.0" provider-name="SuperStream">
+    <requires>
+        <import addon="xbmc.python" version="3.0.0"/>
+    </requires>
+    <extension point="xbmc.python.pluginsource" library="default.py" charset="utf-8">
+        <provides>video</provides>
+    </extension>
+    <extension point="xbmc.addon.metadata">
+        <platform>all</platform>
+        <summary lang="pt_BR">SuperStream - Streams de filmes e séries via Xtream Codes + TMDb</summary>
+        <summary lang="en">SuperStream - Movie/Series streams via Xtream Codes + TMDb</summary>
+        <description lang="pt_BR">SuperStream: catálogo completo do The Movie Database (TMDb) com resolução de streams dos 4 servidores Xtream Codes. A função get_streams recebe um ID de IMDB (tt...) e busca os streams com a mesma velocidade e precisão do addon Stremio, incluindo diálogo de progresso com cancelamento.</description>
+        <description lang="en">SuperStream: complete TMDb catalog with stream resolution from 4 Xtream Codes servers. The get_streams function takes an IMDB id (tt...) and resolves streams with the same speed/precision as the Stremio addon, including a progress dialog with cancel.</description>
+        <icon>icon.png</icon>
+        <fanart>fanart.jpg</fanart>
+        <assets>
+            <icon>icon.png</icon>
+            <fanart>fanart.jpg</fanart>
+        </assets>
+    </extension>
+</addon>
