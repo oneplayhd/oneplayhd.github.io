@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<addon id="plugin.video.oneplay.canais" name="OnePlay Canais" version="0.0.15" provider-name="ONEPLAY">
+  <requires>
+    <import addon="xbmc.python" version="3.0.0" />
+  </requires>
+  <extension point="xbmc.python.pluginsource" library="addon.py">
+    <provides>video</provides>
+  </extension>
+  <extension point="xbmc.addon.metadata">
+    <summary lang="pt_BR">Catálogo OnePlay organizado por conteúdo, com reprodução HLS e proxy local.</summary>
+    <description lang="pt_BR">Catálogo de canais com categorias editoriais, descrições úteis, capas locais de fallback e reprodução direta pelo player do Kodi com proxy HLS local.</description>
+    <platform>all</platform>
+    <license>Proprietary</license>
+    <assets>
+      <icon>resources/icon.png</icon>
+      <fanart>resources/fanart.jpg</fanart>
+    </assets>
+  </extension>
+</addon>
