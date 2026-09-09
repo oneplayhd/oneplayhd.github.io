@@ -771,7 +771,7 @@ v1.0.0
       </assets>
     </extension>
   </addon>
-  <addon id="plugin.video.superstream" name="SuperStream" version="1.0.0" provider-name="SuperStream">
+  <addon id="plugin.video.superstream" name="SuperStream" version="1.0.1" provider-name="SuperStream">
     <requires>
       <import addon="xbmc.python" version="3.0.0"/>
     </requires>
