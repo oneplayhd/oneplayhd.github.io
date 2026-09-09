@@ -606,24 +606,6 @@ v1.0.0
       </assets>
     </extension>
   </addon>
-  <addon id="plugin.video.oneplay.live" name="OnePlay Live" version="1.0.6" provider-name="ONEPLAY LIVE">
-    <requires>
-      <import addon="xbmc.python" version="3.0.0"/>
-    </requires>
-    <extension point="xbmc.python.pluginsource" library="addon.py">
-      <provides>video</provides>
-    </extension>
-    <extension point="xbmc.addon.metadata">
-      <summary lang="pt_BR">TV ao vivo, eventos esportivos e programação com a identidade OnePlay Live.</summary>
-      <description lang="pt_BR">Assista a canais de TV ao vivo e acompanhe eventos esportivos em uma interface organizada. Os eventos aparecem a partir de 20 minutos antes do início, com informações de competição, horário e transmissões disponíveis. Consulte a programação atual e os próximos programas, com capas e informações dos canais. Reprodução adaptativa, recuperação de falhas e retorno à grade após interromper a transmissão.</description>
-      <platform>all</platform>
-      <license>Proprietary</license>
-      <assets>
-        <icon>resources/icon.png</icon>
-        <fanart>resources/fanart.jpg</fanart>
-      </assets>
-    </extension>
-  </addon>
   <addon id="plugin.video.picante" version="1.0.2" name="[COLOR red]PICANTE[/COLOR]" provider-name="OnePlay Team">
     <requires>
       <import addon="script.module.simplejson"/>
