@@ -1,5 +1,5 @@
 <?xml version='1.0' encoding='UTF-8'?>
-<addon id="plugin.video.xcpro" name="XC Pro" version="0.0.4" provider-name="OnePlay Team">
+<addon id="plugin.video.xcpro" name="XC Pro" version="0.0.5" provider-name="OnePlay Team">
     <requires>
         <import addon="xbmc.python" version="3.0.0" />
         <import addon="script.module.requests" version="2.22.0" />
@@ -17,13 +17,14 @@
         <disclaimer lang="en_GB">This add-on does not provide or distribute media content. Users must configure their own legitimate access credentials.</disclaimer>
         <disclaimer lang="pt_BR">Este addon não fornece nem distribui conteúdo de mídia. O usuário deve configurar suas próprias credenciais legítimas de acesso.</disclaimer>
         <platform>all</platform>
-        <news>v0.0.4
+        <news>v0.0.5
 - Migra o resources/settings.xml para o formato moderno do Kodi.
 - Mantém os mesmos IDs de configuração do XC Pro para não perder dados: host, username, password, etc.
 - Reintroduz strings.po apenas para labels/help das configurações, sem alterar menus, fluxo, proxy, EPG, favoritos ou addon_data.
 - Organiza automaticamente o addon_data: cache/api, cache/epg, state, favorites e pairing.
 - Migra arquivos antigos da raiz sem apagar settings.xml do Kodi.
-- Mantém Pesquisa Global 0.0.3, Favoritos sem reload 0.0.4, QR/LAN, EPG, proxy local e diagnóstico de sinopse.</news>
+- Mantém Pesquisa Global 0.0.3, Favoritos sem reload 0.0.4, QR/LAN, EPG, proxy local e diagnóstico de sinopse.
+- Proxy agora funciona com ip do dispositivo</news>
         <assets>
             <icon>icon.png</icon>
             <fanart>fanart.jpg</fanart>
