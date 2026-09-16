@@ -1528,7 +1528,7 @@ v1.0.0
       </assets>
     </extension>
   </addon>
-  <addon id="script.limpeza.oneplay" name="Script Limpeza OnePlay" provider-name="OnePlay" version="1.1.0">
+  <addon id="script.limpeza.oneplay" name="Script Limpeza OnePlay" provider-name="OnePlay" version="1.2.1">
     <requires>
       <import addon="xbmc.python" version="3.0.0"/>
     </requires>
@@ -1538,8 +1538,10 @@ v1.0.0
     <extension point="xbmc.service" library="service.py" start="startup"/>
     <extension point="xbmc.addon.metadata">
       <platform>all</platform>
-      <summary lang="pt_BR">Limpeza segura e leve para Kodi.</summary>
-      <description lang="pt_BR">Analisa e remove caches, temporários, pacotes antigos e miniaturas órfãs com confirmação, proteção de caminhos e relatório final. Atualiza artes por meio da API oficial de texturas do Kodi. Compatível com Kodi 19 a 21.x em Windows, Linux e Android.</description>
+      <summary lang="pt_BR">Limpeza e manutenção segura para Kodi.</summary>
+      <description lang="pt_BR">Analisa e remove cache/temporários vencidos com deduplicação de caminhos, pacotes antigos, bytecode Python e miniaturas órfãs com confirmação e proteção. Atualiza artes e limpa bibliotecas pelas APIs oficiais do Kodi. Compatível com Kodi 19 a 21.x em Windows, Linux e Android.</description>
+      <summary lang="en_GB">Safe cleanup and maintenance for Kodi.</summary>
+      <description lang="en_GB">Analyzes and removes expired cache/temporary files with path deduplication, old packages, Python bytecode and orphan thumbnails with confirmation and protection. Refreshes artwork and cleans libraries through Kodi official APIs. Compatible with Kodi 19 to 21.x on Windows, Linux and Android.</description>
       <license>GPL-3.0-or-later</license>
       <assets>
         <icon>icon.png</icon>
