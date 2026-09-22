@@ -477,7 +477,7 @@ v1.0.0
       </assets>
     </extension>
   </addon>
-  <addon id="plugin.video.ibo.oneplay" name="ONEPLAY IBO" version="2.3.6" provider-name="OnePlay">
+  <addon id="plugin.video.ibo.oneplay" name="ONEPLAY IBO" version="2.3.7" provider-name="OnePlay">
     <requires>
       <import addon="xbmc.python" version="3.0.0"/>
     </requires>
@@ -489,13 +489,13 @@ v1.0.0
       <summary lang="pt_BR">ONEPLAY IBO para Kodi</summary>
       <description lang="pt_BR">Painel por Device ID, Live/EPG, Filmes, Séries, Favoritos, failover, retomada e Cast.</description>
       <news>
-2.3.6 FINAL
-[COLOR lime]•[/COLOR] Device ID, painel e Heartbeat.
-[COLOR lime]•[/COLOR] Live/EPG com failover DNS/mídia e fallback.
-[COLOR lime]•[/COLOR] VOD com Favoritos, histórico, retomada e Relay seguro.
-[COLOR lime]•[/COLOR] Google Cast/DLNA com wake, handoff e STOP.
-[COLOR lime]•[/COLOR] DNS, HTTP, cache e estabilidade reforçados.
-[COLOR aquamarine]Atualização: 2026-09-09[/COLOR]
+2.3.7 CANDIDATO
+[COLOR lime]•[/COLOR] Correção do cache do DNS alternativo.
+[COLOR lime]•[/COLOR] APK abre instalador ou gerenciador de arquivos compatível.
+[COLOR lime]•[/COLOR] Persistência concorrente e ciclo de abertura consolidados.
+[COLOR lime]•[/COLOR] API de controle protegida por HTTPS; DNS Xtream preservado.
+[COLOR lime]•[/COLOR] Cache de catálogos grandes com reavaliação automática.
+[COLOR aquamarine]Atualização: 2026-09-22[/COLOR]
     </news>
       <platform>all</platform>
       <license>proprietary</license>
