@@ -477,7 +477,7 @@ v1.0.0
       </assets>
     </extension>
   </addon>
-  <addon id="plugin.video.ibo.oneplay" name="ONEPLAY IBO" version="2.3.8" provider-name="OnePlay">
+  <addon id="plugin.video.ibo.oneplay" name="ONEPLAY IBO" version="2.3.9" provider-name="OnePlay">
     <requires>
       <import addon="xbmc.python" version="3.0.0"/>
     </requires>
@@ -489,14 +489,16 @@ v1.0.0
       <summary lang="pt_BR">ONEPLAY IBO para Kodi</summary>
       <description lang="pt_BR">Painel por Device ID, Live/EPG, Filmes, Séries, Favoritos, failover, retomada e Cast.</description>
       <news>
-2.3.8 HOMOLOGADO-FINAL
+2.3.9 HOMOLOGADO-FINAL
 [COLOR lime]•[/COLOR] Próximo episódio: padrão seguro no fim real e opções 30/45/60/90/120/180 s.
 [COLOR lime]•[/COLOR] Assistido e retomada independentes, com histórico persistente.
 [COLOR lime]•[/COLOR] Cache manual preserva capas, banners e artes já carregadas.
 [COLOR lime]•[/COLOR] Foco da lista de episódios preservado durante carregamento.
 [COLOR lime]•[/COLOR] Watchdog VOD reconhece retrocesso/seek sem falso encerramento.
 [COLOR lime]•[/COLOR] Fluxos de painel, failover, fallback, Relay, Cast/DLNA e heartbeat preservados.
-[COLOR aquamarine]Homologação final: 2026-10-13[/COLOR]
+[COLOR lime]•[/COLOR] EPG Live dinâmico: informações do reprodutor atualizadas via updateInfoTag.
+[COLOR lime]•[/COLOR] Navegação, Back físico, Up Next, Relay, fallback, DNS, heartbeat e Cast/DLNA preservados.
+[COLOR aquamarine]Homologação da V9 como 2.3.9: 2026-10-18[/COLOR]
     </news>
       <platform>all</platform>
       <license>proprietary</license>
