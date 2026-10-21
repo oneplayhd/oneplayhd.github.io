@@ -1454,6 +1454,31 @@ v1.0.0
       <disclaimer lang="zh_TW">這個附加元件庫的附加元件並非全部由 Kodi 團隊製作的，所以我們不對這些內容負責。</disclaimer>
     </extension>
   </addon>
+  <addon id="repository.nostr" name="Nostr Repository" version="1.0.7" provider-name="ngit">
+    <requires>
+      <import addon="xbmc.addon" version="12.0.0"/>
+    </requires>
+    <extension point="xbmc.addon.repository" name="Nostr Repository">
+      <dir minversion="19.0.0">
+        <info compressed="false">http://127.0.0.1:9432/addons.xml</info>
+        <checksum>http://127.0.0.1:9432/addons.xml.md5</checksum>
+        <datadir zip="true">http://127.0.0.1:9432/zips</datadir>
+        <artdir>http://127.0.0.1:9432/art</artdir>
+      </dir>
+    </extension>
+    <extension point="xbmc.service" library="service.py"/>
+    <extension point="xbmc.addon.metadata">
+      <summary lang="en">Add-ons distributed through the Nostr network</summary>
+      <description lang="en">A decentralized Kodi repository: the add-on catalog is published on Nostr relays (NIP-34, kinds 30617/30618) and the files are downloaded from Blossom servers, verified by SHA-256. No central server needed - repositories are published with ngit (npm install -g nostr-git).</description>
+      <platform>all</platform>
+      <license>MIT</license>
+      <source>https://github.com/zoreu/nostr-git</source>
+      <news>v1.0.0 - first release</news>
+      <assets>
+        <icon>icon.png</icon>
+      </assets>
+    </extension>
+  </addon>
   <addon id="repository.slyguy" name="SlyGuy Repository" provider-name="SlyGuy" version="0.0.9">
     <extension point="xbmc.addon.repository" name="SlyGuy Repository">
       <dir>
