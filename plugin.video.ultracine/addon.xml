@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<addon id="plugin.video.ultracine"
+       version="1.0.0"
+       name="UltraCine"
+       provider-name="UltraCine">
+
+    <requires>
+        <import addon="xbmc.python" version="3.0.0"/>
+        <import addon="inputstream.adaptive"/>
+        <import addon="script.module.requests"/>
+    </requires>
+
+    <extension point="xbmc.python.pluginsource" library="main.py">
+        <provides>video</provides>
+    </extension>
+
+    <extension point="xbmc.addon.metadata">
+        <summary lang="en_GB">UltraCine is a video plugin for Kodi.</summary>
+        <summary lang="pt_BR">UltraCine é um addon de filmes, séries, animes e canais ao vivo para Kodi.</summary>
+
+        <description lang="en_GB">Browse movies, series, anime and live TV channels.</description>
+        <description lang="pt_BR">Catálogo de filmes, séries, animes e canais ao vivo, com busca, servidores de reprodução e metadados TMDB.</description>
+
+        <platform>all</platform>
+        <license>MIT</license>
+
+        <disclaimer lang="en_GB">Content is provided by third-party sources.</disclaimer>
+        <disclaimer lang="pt_BR">Os conteúdos são disponibilizados por fontes de terceiros.</disclaimer>
+
+        <assets>
+            <icon>icon.png</icon>
+            <fanart>fanart.jpg</fanart>
+        </assets>
+    </extension>
+
+</addon>
