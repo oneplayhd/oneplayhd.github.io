@@ -2023,6 +2023,16 @@ v1.0.7 - previous release</news>
       <source>https://github.com/zoreu/service.subtitles.legendei</source>
     </extension>
   </addon>
+  <addon id="service.vozkodi" name="Voz Kodi" version="1.0.0" provider-name="Equipe Oneplay">
+    <requires>
+      <import addon="xbmc.python" version="3.0.0"/>
+    </requires>
+    <extension point="xbmc.service" library="service.py" start="startup"/>
+    <extension point="xbmc.addon.metadata">
+      <summary>Servidor de voz para controle do Kodi</summary>
+      <description>Inicia um servidor HTTP para receber comandos de voz do celular.</description>
+    </extension>
+  </addon>
   <addon id="skin.arctic.horizon.2" name="Arctic Horizon 2" provider-name="jurialmunkey" version="0.8.27">
     <requires>
       <import addon="xbmc.gui" version="5.15.0"/>
