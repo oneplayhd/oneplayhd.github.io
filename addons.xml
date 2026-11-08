@@ -2023,7 +2023,7 @@ v1.0.7 - previous release</news>
       <source>https://github.com/zoreu/service.subtitles.legendei</source>
     </extension>
   </addon>
-  <addon id="service.vozkodi" name="Voz Kodi" version="1.0.0" provider-name="Equipe Oneplay">
+  <addon id="service.vozkodi" name="Voz Kodi" version="1.0.1" provider-name="Equipe Oneplay">
     <requires>
       <import addon="xbmc.python" version="3.0.0"/>
     </requires>
