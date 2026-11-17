@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <addon id="plugin.video.ibo.oneplay"
        name="ONEPLAY IBO"
-       version="2.3.9"
+       version="2.4.0"
        provider-name="OnePlay">
   <requires>
     <import addon="xbmc.python" version="3.0.0"/>
@@ -14,6 +14,12 @@
     <summary lang="pt_BR">ONEPLAY IBO para Kodi</summary>
     <description lang="pt_BR">Painel por Device ID, Live/EPG, Filmes, Séries, Favoritos, failover, retomada e Cast.</description>
     <news>
+2.4.0 CANDIDATO DE HOMOLOGAÇÃO — 2026-11-17
+[COLOR lime]•[/COLOR] Identidade Android persistente e proteção do Teste Automático cumulativas.
+[COLOR lime]•[/COLOR] PAUSE voluntário não aciona watchdog VOD; contagem reinicia no RESUME.
+[COLOR lime]•[/COLOR] Mantidos painéis, DNS, Relay V4/V5, Health, Up Next, histórico, cache e fallback.
+[COLOR yellow]•[/COLOR] Watchdog em stall real aguarda comprovação por teste de campo.
+
 2.3.9 HOMOLOGADO-FINAL
 [COLOR lime]•[/COLOR] Próximo episódio: padrão seguro no fim real e opções 30/45/60/90/120/180 s.
 [COLOR lime]•[/COLOR] Assistido e retomada independentes, com histórico persistente.
