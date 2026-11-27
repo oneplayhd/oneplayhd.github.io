@@ -477,7 +477,7 @@ v1.0.0
       </assets>
     </extension>
   </addon>
-  <addon id="plugin.video.ibo.oneplay" name="ONEPLAY IBO" version="2.4.0" provider-name="OnePlay">
+  <addon id="plugin.video.ibo.oneplay" name="ONEPLAY IBO" version="2.4.1" provider-name="OnePlay">
     <requires>
       <import addon="xbmc.python" version="3.0.0"/>
     </requires>
@@ -489,7 +489,14 @@ v1.0.0
       <summary lang="pt_BR">ONEPLAY IBO para Kodi</summary>
       <description lang="pt_BR">Painel por Device ID, Live/EPG, Filmes, Séries, Favoritos, failover, retomada e Cast.</description>
       <news>
-2.4.0 CANDIDATO DE HOMOLOGAÇÃO — 2026-11-17
+2.4.1 — HOMOLOGAÇÃO OPERACIONAL — 2026-11-26
+[COLOR lime]•[/COLOR] Home Anti-Flicker e carregamento rápido de detalhes e episódios.
+[COLOR lime]•[/COLOR] Arte híbrida, EPG progressivo e proteção da retomada VOD.
+[COLOR lime]•[/COLOR] Sincronização automática dos temas e consulta de Portal sem alteração visual direta.
+[COLOR lime]•[/COLOR] Recuperação Live adaptativa e aviso de falha de reprodução.
+[COLOR yellow]•[/COLOR] Validação de campo específica da extensão adaptativa TS permanece pendente.
+
+2.4.0 — 2026-11-17
 [COLOR lime]•[/COLOR] Identidade Android persistente e proteção do Teste Automático cumulativas.
 [COLOR lime]•[/COLOR] PAUSE voluntário não aciona watchdog VOD; contagem reinicia no RESUME.
 [COLOR lime]•[/COLOR] Mantidos painéis, DNS, Relay V4/V5, Health, Up Next, histórico, cache e fallback.
